@@ -36,7 +36,7 @@ namespace Koitan
         {
             this.playerIndex = playerIndex;
             rb.bodyType = RigidbodyType2D.Kinematic;
-            rb.velocity = Vector3.zero;
+            rb.linearVelocity = Vector3.zero;
             transform.SetParent(handTf);
             transform.position = handTf.position;
             isIgnited = true;
@@ -47,7 +47,7 @@ namespace Koitan
         {
             transform.SetParent(null);
             rb.bodyType = RigidbodyType2D.Dynamic;
-            rb.velocity = speed;
+            rb.linearVelocity = speed;
             isThrowed = true;
             rb.simulated = true;
         }
@@ -59,7 +59,7 @@ namespace Koitan
             eff.SetActive(true);
             explosionArea.SetActive(true);
             rb.bodyType = RigidbodyType2D.Kinematic;
-            rb.velocity = Vector3.zero;
+            rb.linearVelocity = Vector3.zero;
             Destroy(gameObject, 1f);
             isFired = true;
         }

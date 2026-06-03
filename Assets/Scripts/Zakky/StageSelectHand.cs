@@ -36,7 +36,7 @@ public class StageSelectHand : MonoBehaviour
 
     void Move()
     {
-        //ˆÚ“®“ü—Í‚Å‘¬“x‚ð‰Á‘¬
+        //ï¿½Ú“ï¿½ï¿½ï¿½ï¿½Í‚Å‘ï¿½ï¿½xï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         Vector2 tmpspd = Vector2.zero;
         for (int i = 0; i < 4; i++)
         {
@@ -45,12 +45,12 @@ public class StageSelectHand : MonoBehaviour
         }
         tmpspd = new Vector2(Mathf.Clamp(tmpspd.x, -Time.deltaTime, Time.deltaTime),
             Mathf.Clamp(tmpspd.y, -Time.deltaTime, Time.deltaTime));
-        rigidbody2D.velocity += cursorVelocity * tmpspd;
+        rigidbody2D.linearVelocity += cursorVelocity * tmpspd;
 
-        //ƒRƒCƒ“Ž‚Á‚Ä‚é”»’è‚Ì‚Æ‚«
+        //ï¿½Rï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚é”»ï¿½ï¿½Ì‚Æ‚ï¿½
         if (Havecoin)
         {
-            //Žwæ‚Éƒ`ƒbƒv‚ÌŽ‚ÂêŠ‚ðˆÚ“®‚·‚éD
+            //ï¿½wï¿½ï¿½Éƒ`ï¿½bï¿½vï¿½ÌŽï¿½ï¿½ÂêŠï¿½ï¿½ï¿½Ú“ï¿½ï¿½ï¿½ï¿½ï¿½D
             Vector3 ofs = circleCollider2D.offset;
             chip.gameObject.transform.DOMove(transform.position + ofs, 0.05f);
         }
@@ -61,18 +61,18 @@ public class StageSelectHand : MonoBehaviour
         Chip chiptmp = IsChipCollision();
         for (int i = 0; i < 4; i++)
         {
-            //A‰Ÿ‚µ‚Ä‚©‚Â”ÍˆÍ“à‚Éƒ`ƒbƒv‚ª‚ ‚é‚Æ‚«
+            //Aï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½Â”ÍˆÍ“ï¿½ï¿½Éƒ`ï¿½bï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½
             if ((KoitanInput.GetDown(ButtonCode.A, i) && chiptmp != null))
             {
                 chip = chiptmp;
-                //ƒ`ƒbƒvŽ‚¿’u‚«
+                //ï¿½`ï¿½bï¿½vï¿½ï¿½ï¿½ï¿½ï¿½uï¿½ï¿½
                 Havecoin = !Havecoin;
-                //ƒJ[ƒ\ƒ‹‚ÌˆÚ“®‚ðŽ~‚ß‚é
-                rigidbody2D.velocity = Vector2.zero;
+                //ï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½ÌˆÚ“ï¿½ï¿½ï¿½ï¿½~ï¿½ß‚ï¿½
+                rigidbody2D.linearVelocity = Vector2.zero;
             }
             else if (KoitanInput.GetDown(ButtonCode.B, i))
             {
-                //B‰Ÿ‚µ‚½‚Æ‚«ƒ`ƒbƒvŽ‚Â
+                //Bï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½`ï¿½bï¿½vï¿½ï¿½ï¿½ï¿½
                 Havecoin = true;
             }
             Debug.Log(Havecoin);
@@ -89,12 +89,12 @@ public class StageSelectHand : MonoBehaviour
         foreach (Collider2D col in collisions)
         {
             Chip nowchip = col.GetComponent<Chip>();
-            //Ž©•ª‚ÌŽ‚Á‚Ä‚éƒ`ƒbƒv‚©ƒRƒ“ƒsƒ…[ƒ^‚Ìƒ`ƒbƒv‚Ì‚Æ‚«
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ÌŽï¿½ï¿½ï¿½ï¿½Ä‚ï¿½`ï¿½bï¿½vï¿½ï¿½ï¿½Rï¿½ï¿½ï¿½sï¿½ï¿½ï¿½[ï¿½^ï¿½Ìƒ`ï¿½bï¿½vï¿½Ì‚Æ‚ï¿½
             if (col.tag == "Chip")
             {
                 Vector3 off = circleCollider2D.offset;
                 float dis = Vector2.Distance(transform.position + off, col.transform.position);
-                //‚»‚Ìchip‚ðŽæ“¾‚·‚é
+                //ï¿½ï¿½ï¿½ï¿½chipï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½
                 if (distance > dis && !(chip.hadCoin && !nowchip.hadCoin))
                 {
                     distance = dis;

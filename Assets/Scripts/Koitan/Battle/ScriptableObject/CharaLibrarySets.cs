@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Experimental.U2D.Animation;
+
 
 namespace Koitan
 {
@@ -12,6 +12,6 @@ namespace Koitan
     ]
     public class CharaLibrarySets : ScriptableObject
     {
-        public SpriteLibraryAsset[] librarys;
+        public UnityEngine.U2D.Animation.SpriteLibraryAsset[] librarys;
     }
 }

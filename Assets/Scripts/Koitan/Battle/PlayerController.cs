@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using KoitanLib;
-using UnityEngine.Experimental.U2D.Animation;
+//using UnityEngine.Experimental.U2D.Animation;
 using Cinemachine;
 
 

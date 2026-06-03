@@ -1247,7 +1247,7 @@ public class PlatformerMotor2D : MonoBehaviour
     {
         if (_rigidbody2D != null)
         {
-            _velocity = _rigidbody2D.velocity;
+            _velocity = _rigidbody2D.linearVelocity;
             _originalKinematic = _rigidbody2D.isKinematic;
             _rigidbody2D.isKinematic = true;
         }
@@ -1257,7 +1257,7 @@ public class PlatformerMotor2D : MonoBehaviour
     {
         if (_rigidbody2D != null)
         {
-            _rigidbody2D.velocity = _velocity;
+            _rigidbody2D.linearVelocity = _velocity;
             _rigidbody2D.isKinematic = _originalKinematic;
         }
     }

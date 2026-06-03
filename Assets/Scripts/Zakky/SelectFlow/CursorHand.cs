@@ -15,7 +15,7 @@ public class CursorHand : MonoBehaviour
     [SerializeField]
     GameObject Kawaztan;
 
-    //ƒvƒƒpƒeƒB‚É‘ã“ü‚·‚é—p
+    //ï¿½vï¿½ï¿½ï¿½pï¿½eï¿½Bï¿½É‘ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½p
     [SerializeField]
     int id;
 
@@ -49,7 +49,7 @@ public class CursorHand : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //“K“–
+        //ï¿½Kï¿½ï¿½
         switch (playerKind) {
             case PlayerKind.None:
                 Kawaztan.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
@@ -79,18 +79,18 @@ public class CursorHand : MonoBehaviour
     void PutChip()
     {
         Chip chiptmp = IsChipCollision();
-        //A‰Ÿ‚µ‚Ä‚©‚Â”ÍˆÍ“à‚Éƒ`ƒbƒv‚ª‚ ‚é‚Æ‚«
+        //Aï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½Â”ÍˆÍ“ï¿½ï¿½Éƒ`ï¿½bï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½
         if ((KoitanInput.GetDown(ButtonCode.A, ID) && chiptmp != null))
         {
             chip = chiptmp;
-            //ƒ`ƒbƒv‚¿’u‚«
+            //ï¿½`ï¿½bï¿½vï¿½ï¿½ï¿½ï¿½ï¿½uï¿½ï¿½
             Havecoin = !Havecoin;
-            //ƒJ[ƒ\ƒ‹‚ÌˆÚ“®‚ğ~‚ß‚é
-            rigidbody2D.velocity = Vector2.zero;
+            //ï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½ÌˆÚ“ï¿½ï¿½ï¿½ï¿½~ï¿½ß‚ï¿½
+            rigidbody2D.linearVelocity = Vector2.zero;
         }
         else if (KoitanInput.GetDown(ButtonCode.B, ID))
         {
-            //B‰Ÿ‚µ‚½‚Æ‚«ƒ`ƒbƒv‚Â
+            //Bï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½`ï¿½bï¿½vï¿½ï¿½ï¿½ï¿½
             Havecoin = true;
         }
         chip.hadCoin = Havecoin;
@@ -98,13 +98,13 @@ public class CursorHand : MonoBehaviour
 
     void Move()
     {
-        //ˆÚ“®“ü—Í‚Å‘¬“x‚ğ‰Á‘¬
-        rigidbody2D.velocity += cursorVelocity * KoitanInput.GetStick(ID) * Time.deltaTime;
+        //ï¿½Ú“ï¿½ï¿½ï¿½ï¿½Í‚Å‘ï¿½ï¿½xï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        rigidbody2D.linearVelocity += cursorVelocity * KoitanInput.GetStick(ID) * Time.deltaTime;
 
-        //ƒRƒCƒ“‚Á‚Ä‚é”»’è‚Ì‚Æ‚«
+        //ï¿½Rï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚é”»ï¿½ï¿½Ì‚Æ‚ï¿½
         if (Havecoin)
         {
-            //wæ‚Éƒ`ƒbƒv‚Ì‚ÂêŠ‚ğˆÚ“®‚·‚éD
+            //ï¿½wï¿½ï¿½Éƒ`ï¿½bï¿½vï¿½Ìï¿½ï¿½ÂêŠï¿½ï¿½ï¿½Ú“ï¿½ï¿½ï¿½ï¿½ï¿½D
             Vector3 ofs = circleCollider2D.offset;
             chip.gameObject.transform.DOMove(transform.position + ofs , 0.05f);
         }
@@ -126,7 +126,7 @@ public class CursorHand : MonoBehaviour
         }
     }
 
-    //ƒƒ“ƒo‚Å‚Á‚Ä‚éƒ`ƒbƒv‚Æ“¯‚¶ID‚Ì‚Æ‚«true
+    //ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½Åï¿½ï¿½ï¿½ï¿½Ä‚ï¿½`ï¿½bï¿½vï¿½Æ“ï¿½ï¿½ï¿½IDï¿½Ì‚Æ‚ï¿½true
     Chip IsChipCollision()
     {
         Collider2D[] collisions = Physics2D.OverlapCircleAll(transform.position, circleCollider2D.radius);
@@ -136,14 +136,14 @@ public class CursorHand : MonoBehaviour
         foreach (Collider2D col in collisions)
         {
             Chip nowchip = col.GetComponent<Chip>();
-            //©•ª‚Ì‚Á‚Ä‚éƒ`ƒbƒv‚©ƒRƒ“ƒsƒ…[ƒ^‚Ìƒ`ƒbƒv‚Ì‚Æ‚«
+            //ï¿½ï¿½ï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½Ä‚ï¿½`ï¿½bï¿½vï¿½ï¿½ï¿½Rï¿½ï¿½ï¿½sï¿½ï¿½ï¿½[ï¿½^ï¿½Ìƒ`ï¿½bï¿½vï¿½Ì‚Æ‚ï¿½
             if (col.tag == "Chip" &&
                 (nowchip.CursorHand.ID == ID ||
                 (nowchip.CursorHand.playerKind == PlayerKind.Computer && !nowchip.CursorHand.Havecoin)))
             {
                 Vector3 off = circleCollider2D.offset;
                 float dis = Vector2.Distance(transform.position + off, col.transform.position);
-                //‚»‚Ìchip‚ğæ“¾‚·‚é
+                //ï¿½ï¿½ï¿½ï¿½chipï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½
                 if (distance > dis && !(chip.hadCoin && !nowchip.hadCoin))
                 {
                     distance = dis;
