@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
@@ -26,11 +26,13 @@ public class Chip : MonoBehaviour
     CircleCollider2D circleCollider2D;
 
     static List<Chip> AllChips = new List<Chip>();
+
+    // å…¨ã¦ã®ãƒãƒƒãƒ—ãŒæ±ºå®šã—ã¦ã„ã¦ã€ã‚¹ãƒãƒ–ãƒ©ã®ãƒ¬ãƒ‡ã‚£ã‚¹ã‚¿ãƒ¼ãƒˆãŒã§ãã‚‹çŠ¶æ…‹ã‹
     public static bool CanStartBattle()
     {
         foreach(Chip c in AllChips)
         {
-            // None‚Ü‚½‚Ík‚ªDicided‚Å‚ ‚é
+            // Noneã¾ãŸã¯kãŒDicidedã§ã‚ã‚‹
             if (BattleSetting.ControllPlayers[c.CursorHand.ID] != (int)CursorHand.PlayerKind.None && !c.IsDecided) return false;
         }
         return true;
@@ -69,14 +71,14 @@ public class Chip : MonoBehaviour
         foreach (Collider2D col in collisions)
         {
 
-            // ƒAƒCƒRƒ“‚ÉG‚ê‚Ä‚é‚È‚çC‚³‚ç‚ÉƒJ[ƒ\ƒ‹‚¨‚¢‚Ä‚é‚È‚ç
+            // ã‚¢ã‚¤ã‚³ãƒ³ã«è§¦ã‚Œã¦ã‚‹ãªã‚‰ï¼Œã•ã‚‰ã«ã‚«ãƒ¼ã‚½ãƒ«ãŠã„ã¦ã‚‹ãªã‚‰
             if (col.tag == "CharaIcon" && !cursorHand.Havecoin)
             {
-                // ƒLƒƒƒ‰ƒNƒ^[•Ï‚¦‚é
+                // ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼å¤‰ãˆã‚‹
                 int tmp = col.GetComponent<CharaIcon>().CharaID;
-                // •\¦‚³‚ê‚½ƒLƒƒƒ‰‚ÌF•Ï‚¦‚é
+                // è¡¨ç¤ºã•ã‚ŒãŸã‚­ãƒ£ãƒ©ã®è‰²å¤‰ãˆã‚‹
                 if (playerController != null) playerController.ChangeColor(tmp, tmp);
-                // “à•”‚Å‚ÌF‚à•Ï‚¦‚é
+                // å†…éƒ¨ã§ã®è‰²ã‚‚å¤‰ãˆã‚‹
                 BattleSetting.charaColorIndexes[CursorHand.ID] = tmp;
 
                 IsDecided = true;
