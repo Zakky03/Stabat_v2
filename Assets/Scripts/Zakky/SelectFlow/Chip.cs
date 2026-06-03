@@ -30,7 +30,7 @@ public class Chip : MonoBehaviour
     {
         foreach(Chip c in AllChips)
         {
-            //NoneまたはkがDicidedである
+            // NoneまたはkがDicidedである
             if (BattleSetting.ControllPlayers[c.CursorHand.ID] != (int)CursorHand.PlayerKind.None && !c.IsDecided) return false;
         }
         return true;
@@ -69,14 +69,14 @@ public class Chip : MonoBehaviour
         foreach (Collider2D col in collisions)
         {
 
-            //アイコンに触れてるなら，さらにカーソルおいてるなら
+            // アイコンに触れてるなら，さらにカーソルおいてるなら
             if (col.tag == "CharaIcon" && !cursorHand.Havecoin)
             {
-                //キャラクター変える
+                // キャラクター変える
                 int tmp = col.GetComponent<CharaIcon>().CharaID;
-                //表示されたキャラの色変える
+                // 表示されたキャラの色変える
                 if (playerController != null) playerController.ChangeColor(tmp, tmp);
-                //内部での色も変える
+                // 内部での色も変える
                 BattleSetting.charaColorIndexes[CursorHand.ID] = tmp;
 
                 IsDecided = true;

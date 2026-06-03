@@ -15,7 +15,7 @@ public class CursorHand : MonoBehaviour
     [SerializeField]
     GameObject Kawaztan;
 
-    //�v���p�e�B�ɑ������p
+    // プロパティに代入用
     [SerializeField]
     int id;
 
@@ -49,19 +49,18 @@ public class CursorHand : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //�K��
         switch (playerKind) {
             case PlayerKind.None:
-                Kawaztan.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
+                // かわずたんなし
                 break;
             case PlayerKind.Human:
-                Kawaztan.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+                // かわずたんプレイヤー
                 break;
             case PlayerKind.Computer:
-                Kawaztan.transform.rotation = Quaternion.Euler(0f, 0f, 90f);
+                // かわずたんコンピュータ
                 break;
         }
-
+        
 
         PutChip();
 
@@ -79,18 +78,18 @@ public class CursorHand : MonoBehaviour
     void PutChip()
     {
         Chip chiptmp = IsChipCollision();
-        //A�����Ă��͈͓��Ƀ`�b�v������Ƃ�
+        // Aが入っている範囲内にチップがあるとき
         if ((KoitanInput.GetDown(ButtonCode.A, ID) && chiptmp != null))
         {
             chip = chiptmp;
-            //�`�b�v�����u��
+            // チップを置く
             Havecoin = !Havecoin;
-            //�J�[�\���̈ړ����~�߂�
+            // カーソルの移動を止める
             rigidbody2D.linearVelocity = Vector2.zero;
         }
         else if (KoitanInput.GetDown(ButtonCode.B, ID))
         {
-            //B�������Ƃ��`�b�v����
+            // Bを押したときチップをとる
             Havecoin = true;
         }
         chip.hadCoin = Havecoin;
@@ -98,13 +97,13 @@ public class CursorHand : MonoBehaviour
 
     void Move()
     {
-        //�ړ����͂ő��x������
+        // 移動量で速度を求める
         rigidbody2D.linearVelocity += cursorVelocity * KoitanInput.GetStick(ID) * Time.deltaTime;
 
-        //�R�C�������Ă锻��̂Ƃ�
+        // コインを持っているとき
         if (Havecoin)
         {
-            //�w��Ƀ`�b�v�̎��ꏊ���ړ�����D
+            // 指定したチップの初期場所へ移動する
             Vector3 ofs = circleCollider2D.offset;
             chip.gameObject.transform.DOMove(transform.position + ofs , 0.05f);
         }
@@ -126,7 +125,7 @@ public class CursorHand : MonoBehaviour
         }
     }
 
-    //�����o�Ŏ����Ă�`�b�v�Ɠ���ID�̂Ƃ�true
+    // 引数で渡されてるチップと同じIDのときtrue
     Chip IsChipCollision()
     {
         Collider2D[] collisions = Physics2D.OverlapCircleAll(transform.position, circleCollider2D.radius);
@@ -136,14 +135,14 @@ public class CursorHand : MonoBehaviour
         foreach (Collider2D col in collisions)
         {
             Chip nowchip = col.GetComponent<Chip>();
-            //�����̎����Ă�`�b�v���R���s���[�^�̃`�b�v�̂Ƃ�
+            // 引数の渡されてるチップがコンピュータのチップのとき
             if (col.tag == "Chip" &&
                 (nowchip.CursorHand.ID == ID ||
                 (nowchip.CursorHand.playerKind == PlayerKind.Computer && !nowchip.CursorHand.Havecoin)))
             {
                 Vector3 off = circleCollider2D.offset;
                 float dis = Vector2.Distance(transform.position + off, col.transform.position);
-                //����chip���擾����
+                // 引数のchipを取得する
                 if (distance > dis && !(chip.hadCoin && !nowchip.hadCoin))
                 {
                     distance = dis;
