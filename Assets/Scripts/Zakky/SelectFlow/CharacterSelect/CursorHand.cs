@@ -38,6 +38,8 @@ public class CursorHand : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        CursorHandManager.RegisterCursorHand(this);
+
         rigidbody2D = GetComponent<Rigidbody2D>();
         circleCollider2D = GetComponent<CircleCollider2D>();
         Havecoin = false;
@@ -60,7 +62,6 @@ public class CursorHand : MonoBehaviour
                 // かわずたんコンピュータ
                 break;
         }
-        
 
         PutChip();
 
@@ -121,6 +122,27 @@ public class CursorHand : MonoBehaviour
         if (KoitanInput.GetDown(ButtonCode.X, ID) && Chip.CanStartBattle())
         {
             Chip.DeleteChipsList();
+
+            // バトル開始のパラメータをセット
+            foreach(CursorHand cur in CursorHandManager.GetCursorHandList())
+            {
+                if (cur.playerKind != PlayerKind.None)
+                {
+                    BattleSetting.playerCount++;
+
+                    if (cur.playerKind == PlayerKind.Human)
+                    {
+                        BattleSetting.ControllPlayers[cur.ID] = 1;
+                    }
+                    else if (cur.playerKind == PlayerKind.Computer)
+                    {
+                        BattleSetting.ControllPlayers[cur.ID] = 2;
+                    }
+                    BattleSetting.playerIndexes[cur.ID] = cur.ID;
+                    BattleSetting.teamColorIndexes[cur.ID] = cur.ID;
+                }
+            }
+
             BattleManager.StartBattle();
         }
     }

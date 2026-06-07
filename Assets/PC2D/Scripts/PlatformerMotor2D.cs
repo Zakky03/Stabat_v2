@@ -1045,7 +1045,7 @@ public class PlatformerMotor2D : MonoBehaviour
         return ((0x1 << obj.layer) & staticEnvLayerMask) != 0;
     }
 
-    #endregion
+#endregion
 
     #region Private
 
