@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/DebugScelectScene.unity
     guid: ce63326f98531104992b2df8292e1e44
   - enabled: 1
+    path: Assets/Scenes/Zakky/OnlineBattleScene.unity
+    guid: bd1baf9aeca98ec4fb1309bf15d2e9a5
+  - enabled: 1
     path: Assets/Scenes/BattleScene.unity
     guid: 0732143b7e97e884c9926e34f6e67f64
   - enabled: 1
