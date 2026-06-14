@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using KoitanLib;
@@ -11,19 +11,19 @@ namespace KoitanLib
 {
     public class DebugMenu : MonoBehaviour
     {
-        //ƒƒjƒ…[‚ğŠJ‚¢‚Ä‚¢‚é‚©
+        //ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’é–‹ã„ã¦ã„ã‚‹ã‹
         bool isOpen = false;
-        //ƒƒjƒ…[‚ÌŠî–{\¬
-        //•¶Í
+        //ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®åŸºæœ¬æ§‹æˆ
+        //æ–‡ç« 
         Func<string>[] statements = new Func<string>[16];
         Func<string>[] infoMessages = new Func<string>[16];
-        //ƒAƒNƒVƒ‡ƒ“
+        //ã‚¢ã‚¯ã‚·ãƒ§ãƒ³
         Action[] acts = new Action[16];
         int maxIndex = 16;
         int currentIndex = 0;
         Action currentAct;
         string currentMenuName;
-        //—š—ğ
+        //å±¥æ­´
         List<string> historyStrs = new List<string>();
         string historyStatement;
         Stack<Action> historyActs = new Stack<Action>();
@@ -53,13 +53,13 @@ namespace KoitanLib
         // Update is called once per frame
         void Update()
         {
-            //í•\¦
+            //å¸¸æ™‚è¡¨ç¤º
             if (isShowFPS)
             {
                 KoitanDebug.Display($"FPS {fpsCounter.fps}\n");
             }
 
-            // ”{‘¬
+            // å€é€Ÿ
             if (Input.GetKey(KeyCode.I))
             {
                 Time.timeScale = 10f;
@@ -91,7 +91,7 @@ namespace KoitanLib
                 return;
             }
 
-            //ƒJ[ƒ\ƒ‹ˆÚ“®
+            //ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹•
             if (Input.GetKeyDown(KeyCode.UpArrow) || KoitanInput.GetDown(ButtonCode.Up))
             {
                 currentIndex = (currentIndex - 1 + maxIndex) % maxIndex;
@@ -100,14 +100,14 @@ namespace KoitanLib
             {
                 currentIndex = (currentIndex + 1 + maxIndex) % maxIndex;
             }
-            //ƒLƒƒƒ“ƒZƒ‹
+            //ã‚­ãƒ£ãƒ³ã‚»ãƒ«
             if (Input.GetKeyDown(KeyCode.X) || KoitanInput.GetDown(ButtonCode.B))
             {
                 if (historyActs.Count > 1)
                 {
                     historyStrs.RemoveAt(historyStrs.Count - 1);
                     historyStatement = String.Join(" > ", historyStrs);
-                    //Œ»İ‚Ìƒy[ƒW‚Ì—š—ğ‚ğÁ‚·
+                    //ç¾åœ¨ã®ãƒšãƒ¼ã‚¸ã®å±¥æ­´ã‚’æ¶ˆã™
                     historyActs.Pop();
                     currentAct = historyActs.Peek();
                     currentAct();
@@ -121,14 +121,14 @@ namespace KoitanLib
             }
             else
             {
-                //Às@
+                //å®Ÿè¡Œã€€
                 acts[currentIndex]();
             }
 
-            //•`‰æ            
+            //æç”»            
             if (historyStrs.Count > 0)
             {
-                //–ˆƒtƒŒ[ƒ€ŒvZ‚·‚é‚Ì‚Í‚æ‚­‚È‚¢
+                //æ¯ãƒ•ãƒ¬ãƒ¼ãƒ è¨ˆç®—ã™ã‚‹ã®ã¯ã‚ˆããªã„
                 //KoitanDebug.Display($"{historyStatement}\n");
                 KoitanDebug.Display($"--- {currentMenuName} ---\n");
             }
@@ -140,11 +140,11 @@ namespace KoitanLib
             {
                 if (i == currentIndex)
                 {
-                    KoitanDebug.Display($"œ{statements[i]()}\n");
+                    KoitanDebug.Display($"â—{statements[i]()}\n");
                 }
                 else if (i < maxIndex)
                 {
-                    KoitanDebug.Display($"@{statements[i]()}\n");
+                    KoitanDebug.Display($"ã€€{statements[i]()}\n");
                 }
                 else
                 {
@@ -155,28 +155,28 @@ namespace KoitanLib
         }
 
         /// <summary>
-        /// Å‰‚Ì‰æ–Ê
+        /// æœ€åˆã®ç”»é¢
         /// </summary>
         void MainMenu()
         {
-            currentMenuName = "ƒfƒoƒbƒOƒƒjƒ…[";
+            currentMenuName = "ãƒ‡ãƒãƒƒã‚°ãƒ¡ãƒ‹ãƒ¥ãƒ¼";
             maxIndex = 5;
-            statements[0] = () => $"ƒTƒEƒ“ƒh";
-            statements[1] = () => $"ƒfƒBƒXƒvƒŒƒC";
-            statements[2] = () => $"í•\¦î•ñ";
-            statements[3] = () => $"ƒoƒgƒ‹";
-            statements[4] = () => $"ƒRƒ“ƒgƒ[ƒ‰[İ’è";
+            statements[0] = () => $"ã‚µã‚¦ãƒ³ãƒ‰";
+            statements[1] = () => $"ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤";
+            statements[2] = () => $"å¸¸æ™‚è¡¨ç¤ºæƒ…å ±";
+            statements[3] = () => $"ãƒãƒˆãƒ«";
+            statements[4] = () => $"ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼è¨­å®š";
             acts[0] = ButtonDownAct(SoundMenu);
             acts[1] = ButtonDownAct(VideoMenu);
             acts[2] = ButtonDownAct(DisplayMenu);
             acts[3] = ButtonDownAct(BattleMenu);
             acts[4] = ButtonDownAct(ControllerMenu);
-            infoMessages[0] = () => $"ƒTƒEƒ“ƒhİ’è‚ğŠJ‚«‚Ü‚·";
-            infoMessages[1] = () => $"ƒfƒBƒXƒvƒŒƒCİ’è‚ğŠJ‚«‚Ü‚·";
-            infoMessages[2] = () => $"í•\¦î•ñİ’è‚ğŠJ‚«‚Ü‚·";
-            infoMessages[3] = () => $"ƒoƒgƒ‹İ’è‚ğŠJ‚«‚Ü‚·";
-            infoMessages[4] = () => $"ƒRƒ“ƒgƒ[ƒ‰[İ’è‚ğŠJ‚«‚Ü‚·";
-            //’Ç‰Á‚Å‚«‚È‚¢‚æ‚¤‚É
+            infoMessages[0] = () => $"ã‚µã‚¦ãƒ³ãƒ‰è¨­å®šã‚’é–‹ãã¾ã™";
+            infoMessages[1] = () => $"ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤è¨­å®šã‚’é–‹ãã¾ã™";
+            infoMessages[2] = () => $"å¸¸æ™‚è¡¨ç¤ºæƒ…å ±è¨­å®šã‚’é–‹ãã¾ã™";
+            infoMessages[3] = () => $"ãƒãƒˆãƒ«è¨­å®šã‚’é–‹ãã¾ã™";
+            infoMessages[4] = () => $"ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼è¨­å®šã‚’é–‹ãã¾ã™";
+            //è¿½åŠ ã§ããªã„ã‚ˆã†ã«
             PlayerInputManager.instance.DisableJoining();
         }
 
@@ -185,33 +185,33 @@ namespace KoitanLib
         {
             currentMenuName = "SoundMenu";
             maxIndex = 3;
-            statements[0] = () => $"‘S‘Ì < 8 >";
+            statements[0] = () => $"å…¨ä½“ < 8 >";
             statements[1] = () => $"BGM < 8 >";
             statements[2] = () => $"SE < 8 >";
             acts[0] = NoneAction;
             acts[1] = ButtonDownAct(NoneAction);
             acts[2] = ButtonDownAct(NoneAction);
-            infoMessages[0] = () => $"‘S‘Ì‚Ì‰¹—Ê‚ğ’²®‚Å‚«‚Ü‚·";
-            infoMessages[1] = () => $"BGM‚Ì‰¹—Ê‚ğ’²®‚Å‚«‚Ü‚·";
-            infoMessages[2] = () => $"SE‚Ì‰¹—Ê‚ğ’²®‚Å‚«‚Ü‚·";
+            infoMessages[0] = () => $"å…¨ä½“ã®éŸ³é‡ã‚’èª¿æ•´ã§ãã¾ã™";
+            infoMessages[1] = () => $"BGMã®éŸ³é‡ã‚’èª¿æ•´ã§ãã¾ã™";
+            infoMessages[2] = () => $"SEã®éŸ³é‡ã‚’èª¿æ•´ã§ãã¾ã™";
         }
 
         void VideoMenu()
         {
-            currentMenuName = "ƒfƒBƒXƒvƒŒƒCİ’è";
+            currentMenuName = "ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤è¨­å®š";
             maxIndex = 4;
-            statements[0] = () => $"ƒtƒ‹ƒXƒNƒŠ[ƒ“ < {Screen.fullScreen} >";
-            statements[1] = () => $"‰ğ‘œ“x < {resolutions[resIndex, 0]} x {resolutions[resIndex, 1]} >";
+            statements[0] = () => $"ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ < {Screen.fullScreen} >";
+            statements[1] = () => $"è§£åƒåº¦ < {resolutions[resIndex, 0]} x {resolutions[resIndex, 1]} >";
             statements[2] = () => $"VSync < {QualitySettings.vSyncCount} >";
-            statements[3] = () => $"ƒ|ƒXƒgƒGƒtƒFƒNƒg < ON >";
+            statements[3] = () => $"ãƒã‚¹ãƒˆã‚¨ãƒ•ã‚§ã‚¯ãƒˆ < ON >";
             acts[0] = SelectFullScreen;
             acts[1] = SelectResolution;
             acts[2] = SelectVSync;
             acts[3] = ButtonDownAct(NoneAction);
-            infoMessages[0] = () => $"ƒtƒ‹ƒXƒNƒŠ[ƒ“‚Ìİ’è";
-            infoMessages[1] = () => $"‰ğ‘œ“x‚ğ•ÏX‚Å‚«‚Ü‚·";
-            infoMessages[2] = () => $"Vsync‚ğ•ÏX‚Å‚«‚Ü‚·";
-            infoMessages[3] = () => $"ƒ|ƒXƒgƒGƒtƒFƒNƒg";
+            infoMessages[0] = () => $"ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã®è¨­å®š";
+            infoMessages[1] = () => $"è§£åƒåº¦ã‚’å¤‰æ›´ã§ãã¾ã™";
+            infoMessages[2] = () => $"Vsyncã‚’å¤‰æ›´ã§ãã¾ã™";
+            infoMessages[3] = () => $"ãƒã‚¹ãƒˆã‚¨ãƒ•ã‚§ã‚¯ãƒˆ";
         }
 
         void DisplayMenu()
@@ -220,17 +220,17 @@ namespace KoitanLib
             maxIndex = 1;
             statements[0] = () => $"Show FPS < {(isShowFPS ? "ON" : "OFF")} >";
             acts[0] = () => SelectBool(ref isShowFPS);
-            infoMessages[0] = () => $"FPS‚ğí•\¦‚Å‚«‚Ü‚·";
+            infoMessages[0] = () => $"FPSã‚’å¸¸æ™‚è¡¨ç¤ºã§ãã¾ã™";
         }
 
         void BattleMenu()
         {
-            currentMenuName = "ƒoƒgƒ‹ƒƒjƒ…[";
+            currentMenuName = "ãƒãƒˆãƒ«ãƒ¡ãƒ‹ãƒ¥ãƒ¼";
             maxIndex = 4 + BattleSetting.playerCount;
-            statements[0] = () => $"ƒoƒgƒ‹ŠJn";
-            statements[1] = () => $"ƒXƒe[ƒW < {BattleSetting.battleStageIndex} >";
-            statements[2] = () => $"l” < {BattleSetting.playerCount} >";
-            statements[3] = () => $"©“®İ’è";
+            statements[0] = () => $"ãƒãƒˆãƒ«é–‹å§‹";
+            statements[1] = () => $"ã‚¹ãƒ†ãƒ¼ã‚¸ < {BattleSetting.battleStageIndex} >";
+            statements[2] = () => $"äººæ•° < {BattleSetting.playerCount} >";
+            statements[3] = () => $"è‡ªå‹•è¨­å®š";
             acts[0] = ButtonDownActNoHistory(BattleStart);
             acts[1] = () =>
             {
@@ -243,28 +243,28 @@ namespace KoitanLib
                 maxIndex = 4 + BattleSetting.playerCount;
             };
             acts[3] = ButtonDownAct(BattleAutoSetting);
-            infoMessages[0] = () => $"ƒoƒgƒ‹‚ğŠJn‚µ‚Ü‚·";
-            infoMessages[1] = () => $"ƒXƒe[ƒW‚ğİ’è‚µ‚Ü‚·";
-            infoMessages[2] = () => $"l”‚ğİ’è‚µ‚Ü‚·";
-            infoMessages[3] = () => $"Œ»İ‚ÌƒRƒ“ƒgƒ[ƒ‰[‚ÌlŠÔİ’èAc‚è‚ğCPU‚Å–„‚ß‚Ü‚·";
+            infoMessages[0] = () => $"ãƒãƒˆãƒ«ã‚’é–‹å§‹ã—ã¾ã™";
+            infoMessages[1] = () => $"ã‚¹ãƒ†ãƒ¼ã‚¸ã‚’è¨­å®šã—ã¾ã™";
+            infoMessages[2] = () => $"äººæ•°ã‚’è¨­å®šã—ã¾ã™";
+            infoMessages[3] = () => $"ç¾åœ¨ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ã®äººé–“è¨­å®šã€æ®‹ã‚Šã‚’CPUã§åŸ‹ã‚ã¾ã™";
 
             for (int i = 0; i < BattleGlobal.MaxPlayerNum; i++)
             {
                 int tmpI = i;
                 statements[i + 4] = () => $"Player{tmpI}, {(ControllPlayer)BattleSetting.ControllPlayers[tmpI]}, {BattleSetting.teamColorIndexes[tmpI]}, {BattleSetting.playerIndexes[tmpI]}, {BattleSetting.charaColorIndexes[tmpI]}";
                 acts[i + 4] = ButtonDownAct(PlayerSetting(tmpI));
-                infoMessages[i + 4] = () => $"Player{tmpI}‚Ìİ’è‚ğ•ÏX‚µ‚Ü‚·";
+                infoMessages[i + 4] = () => $"Player{tmpI}ã®è¨­å®šã‚’å¤‰æ›´ã—ã¾ã™";
             }
         }
 
         void ControllerMenu()
         {
-            currentMenuName = "ƒRƒ“ƒgƒ[ƒ‰[İ’è";
+            currentMenuName = "ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼è¨­å®š";
             maxIndex = 1;
-            statements[0] = () => $"ƒRƒ“ƒgƒ[ƒ‰[‚ğ‚Â‚È‚¬’¼‚·";
+            statements[0] = () => $"ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ã‚’ã¤ãªãç›´ã™";
             acts[0] = ButtonDownActNoHistory(KoitanInput.ClearAllController);
-            infoMessages[0] = () => $"‚±‚Ì‰æ–Ê‚Åƒ{ƒ^ƒ“‚ğ‰Ÿ‚·‚ÆƒRƒ“ƒgƒ[ƒ‰[‚Ì“o˜^‚ª‚Å‚«‚Ü‚·";
-            //ƒRƒ“ƒgƒ[ƒ‰[‚Ìó•t
+            infoMessages[0] = () => $"ã“ã®ç”»é¢ã§ãƒœã‚¿ãƒ³ã‚’æŠ¼ã™ã¨ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ã®ç™»éŒ²ãŒã§ãã¾ã™";
+            //ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ã®å—ä»˜
             PlayerInputManager.instance.EnableJoining();
         }
 
@@ -274,18 +274,18 @@ namespace KoitanLib
             {
                 currentMenuName = $"Player{index}Setting";
                 maxIndex = 4;
-                statements[0] = () => $"‘€ìÒ < {(ControllPlayer)BattleSetting.ControllPlayers[index]} >";
-                statements[1] = () => $"ƒ`[ƒ€ < {BattleSetting.teamColorIndexes[index]} >";
-                statements[2] = () => $"ƒvƒŒƒCƒ„[”Ô† < {BattleSetting.playerIndexes[index]} >";
-                statements[3] = () => $"ƒLƒƒƒ‰ƒJƒ‰[ < {BattleSetting.charaColorIndexes[index]} >";
+                statements[0] = () => $"æ“ä½œè€… < {(ControllPlayer)BattleSetting.ControllPlayers[index]} >";
+                statements[1] = () => $"ãƒãƒ¼ãƒ  < {BattleSetting.teamColorIndexes[index]} >";
+                statements[2] = () => $"ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç•ªå· < {BattleSetting.playerIndexes[index]} >";
+                statements[3] = () => $"ã‚­ãƒ£ãƒ©ã‚«ãƒ©ãƒ¼ < {BattleSetting.charaColorIndexes[index]} >";
                 acts[0] = () => SelectInt(ref BattleSetting.ControllPlayers[index], 0, 2);
                 acts[1] = () => SelectInt(ref BattleSetting.teamColorIndexes[index], 0, BattleGlobal.MaxPlayerNum - 1);
                 acts[2] = () => SelectInt(ref BattleSetting.playerIndexes[index], 0, BattleGlobal.MaxPlayerNum - 1);
                 acts[3] = () => SelectInt(ref BattleSetting.charaColorIndexes[index], 0, BattleGlobal.MaxPlayerNum - 1);
-                infoMessages[0] = () => $"‘€ì‚·‚él‚ğ•ÏX‚Å‚«‚Ü‚·";
-                infoMessages[1] = () => $"ƒ`[ƒ€‚ğ•ÏX‚Å‚«‚Ü‚·";
-                infoMessages[2] = () => $"ƒvƒŒƒCƒ„[”Ô†‚ğ•ÏX‚Å‚«‚Ü‚·";
-                infoMessages[3] = () => $"ƒLƒƒƒ‰ƒJƒ‰[‚ğ•ÏX‚Å‚«‚Ü‚·";
+                infoMessages[0] = () => $"æ“ä½œã™ã‚‹äººã‚’å¤‰æ›´ã§ãã¾ã™";
+                infoMessages[1] = () => $"ãƒãƒ¼ãƒ ã‚’å¤‰æ›´ã§ãã¾ã™";
+                infoMessages[2] = () => $"ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç•ªå·ã‚’å¤‰æ›´ã§ãã¾ã™";
+                infoMessages[3] = () => $"ã‚­ãƒ£ãƒ©ã‚«ãƒ©ãƒ¼ã‚’å¤‰æ›´ã§ãã¾ã™";
             };
         }
 
@@ -367,11 +367,11 @@ namespace KoitanLib
         {
             currentAct = act;
             act();
-            //‹L‰¯‚µ‚Ä‚¨‚­
+            //è¨˜æ†¶ã—ã¦ãŠã
             historyStrs.Add(currentMenuName);
             historyActs.Push(currentAct);
             historyIndexes.Push(currentIndex);
-            //XV
+            //æ›´æ–°
             currentIndex = 0;
             historyStatement = String.Join(" > ", historyStrs);
         }
