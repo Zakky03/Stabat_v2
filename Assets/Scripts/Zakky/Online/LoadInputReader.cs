@@ -13,6 +13,7 @@ public class LocalInputReader : MonoBehaviour
 
     public Vector2 Stick { get; private set; }
     public bool JumpPressed { get; private set; }
+    public bool JumpHeld { get; private set; }
     public bool AttackPressed { get; private set; }
 
     private void Awake()
@@ -26,8 +27,8 @@ public class LocalInputReader : MonoBehaviour
         Instance = this;
 
         moveAction = actions.FindAction("Stick", true);
-        jumpAction = actions.FindAction("A", false);
-        attackAction = actions.FindAction("B", false);
+        jumpAction = actions.FindAction("B", false);
+        attackAction = actions.FindAction("A", false);
     }
 
     private void OnEnable()
@@ -45,6 +46,8 @@ public class LocalInputReader : MonoBehaviour
         Stick = moveAction.ReadValue<Vector2>();
 
         JumpPressed |= jumpAction != null && jumpAction.WasPressedThisFrame();
+        JumpHeld = jumpAction.IsPressed();
+
         AttackPressed |= attackAction != null && attackAction.WasPressedThisFrame();
     }
 
@@ -55,7 +58,7 @@ public class LocalInputReader : MonoBehaviour
             Stick = Stick
         };
 
-        data.Buttons.Set(PlayerButtons.Jump, JumpPressed);
+        data.Buttons.Set(PlayerButtons.Jump, JumpPressed || JumpHeld);
         data.Buttons.Set(PlayerButtons.Action, AttackPressed);
 
         JumpPressed = false;
