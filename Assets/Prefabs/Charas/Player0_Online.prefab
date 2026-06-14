@@ -1638,7 +1638,7 @@ MonoBehaviour:
   SyncScale: 0
   SyncParent: 0
   _autoAOIOverride: 1
-  DisableSharedModeInterpolation: 0
+  DisableSharedModeInterpolation: 1
 --- !u!1 &338428582433523639
 GameObject:
   m_ObjectHideFlags: 0
