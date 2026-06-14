@@ -6,6 +6,7 @@ using Cinemachine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.Android;
 
 namespace Koitan
 {
@@ -92,6 +93,11 @@ namespace Koitan
             {
                 Destroy(this);
             }
+        }
+
+        public Transform GetInitPosition(int index)
+        {
+            return initPositions[index];
         }
 
         private void Start()

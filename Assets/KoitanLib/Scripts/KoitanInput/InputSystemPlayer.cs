@@ -13,7 +13,7 @@ namespace KoitanLib
     public class InputSystemPlayer : ControllerInput
     {
         private PlayerInput playerInput;
-        public int joinIndex { get; private set; }
+        //public int joinIndex { get; private set; }
         private InputAction StickInput;
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace KoitanLib
                 //ButtonCode‚ÆAction‚Ì–¼‘O‚ðˆê’v‚³‚¹‚é
                 currentInput.Add(code, playerInput.currentActionMap.FindAction(code.ToString()));
             }
-            joinIndex = playerInput.playerIndex;
+            //joinIndex = playerInput.playerIndex;
             controllerName = playerInput.devices[0].displayName;
             //“o˜^
             //KoitanInput.SetHumanInput(this);
