@@ -8,6 +8,7 @@ namespace Koitan
     {
         [Networked] public int PlayerIndex { get; set; }
         [Networked] public int TeamIndex { get; set; } = -1;
+        [Networked] private NetworkBool FacingRight { get; set; }
 
         private Animator animator;
         private PlatformerMotor2D motor;
@@ -72,17 +73,21 @@ namespace Koitan
             if (stick.x > 0.1f)
             {
                 animator.SetBool("Run", true);
+                FacingRight = true;
                 transform.localScale = new Vector3(1, 1, 1);
             }
             else if (stick.x < -0.1f)
             {
                 animator.SetBool("Run", true);
+                FacingRight = false;
                 transform.localScale = new Vector3(-1, 1, 1);
             }
             else
             {
                 animator.SetBool("Run", false);
             }
+
+            transform.localScale = FacingRight ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
 
             motor.normalizedXMovement = stick.x;
             motor.normalizedYMovement = stick.y;

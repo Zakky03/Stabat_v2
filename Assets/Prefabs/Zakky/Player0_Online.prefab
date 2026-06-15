@@ -1637,7 +1637,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkTransform
   _stateAuthorityChangeErrorCorrectionDelta: 0
-  SyncScale: 1
+  SyncScale: 0
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 1
