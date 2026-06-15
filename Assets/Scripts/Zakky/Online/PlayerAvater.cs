@@ -74,13 +74,11 @@ namespace Koitan
             {
                 animator.SetBool("Run", true);
                 FacingRight = true;
-                transform.localScale = new Vector3(1, 1, 1);
             }
             else if (stick.x < -0.1f)
             {
                 animator.SetBool("Run", true);
                 FacingRight = false;
-                transform.localScale = new Vector3(-1, 1, 1);
             }
             else
             {
