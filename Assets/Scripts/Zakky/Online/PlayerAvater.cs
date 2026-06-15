@@ -16,7 +16,7 @@ namespace Koitan
         [SerializeField] private CharaLibrarySets librarySets;
         [SerializeField] private Transform handTf;
 
-        private ShopController nearShop = null;
+        private OnlineShopController nearShop = null;
         private Bomb nearBomb = null;
         private Bomb grabedBomb = null;
 
@@ -100,7 +100,8 @@ namespace Koitan
             {
                 if (nearShop != null)
                 {
-                    nearShop.BuildShop(TeamIndex);
+                    //nearShop.BuildShop(TeamIndex);
+                    nearShop.TryBuildShop(TeamIndex);   // É`Å[ÉÄindexÇÕÇ‹Çæ
                 }
                 else if (grabedBomb != null)
                 {
@@ -187,7 +188,8 @@ namespace Koitan
                 case "Land":
                     if (nearShop == null)
                     {
-                        nearShop = collision.transform.parent.GetComponent<ShopController>();
+                        //nearShop = collision.transform.parent.GetComponent<ShopController>();
+                        nearShop = collision.transform.parent.GetComponent<OnlineShopController>();
                     }
                     break;
 
