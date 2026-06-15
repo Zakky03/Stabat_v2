@@ -8,7 +8,7 @@ namespace Koitan
     {
         [Networked] public int PlayerIndex { get; set; }
         [Networked] public int TeamIndex { get; set; } = -1;
-        [Networked] private NetworkBool FacingRight { get; set; }
+        [Networked] private NetworkBool FacingRight { get; set; } = true;
 
         private Animator animator;
         private PlatformerMotor2D motor;
