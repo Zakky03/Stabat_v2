@@ -36,6 +36,9 @@ namespace Koitan
         {
             //Debug.Log($"[PlayerAvatar] FixedUpdateNetwork name={name}, HasInputAuthority={HasInputAuthority}");
 
+            if (!HasStateAuthority)
+                return;
+
             if (!GetInput(out NetworkInputData input))
             {
                 Debug.LogWarning($"[PlayerAvatar] GetInput failed name={name}");
