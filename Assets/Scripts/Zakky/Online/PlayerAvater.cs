@@ -33,10 +33,14 @@ namespace Koitan
             TryGetComponent(out charaColorChanger);
         }
 
+        public override void Render()
+        {
+            transform.localScale = FacingRight ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
+        }
+
         public override void FixedUpdateNetwork()
         {
             //Debug.Log($"[PlayerAvatar] FixedUpdateNetwork name={name}, HasInputAuthority={HasInputAuthority}");
-            transform.localScale = FacingRight ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
 
             if (!HasStateAuthority)
                 return;
