@@ -40,7 +40,7 @@ namespace KoitanLib
         [Conditional("KOITAN_DEBUG")]
         public static void Display(string str)
         {
-            instance.dtm.Display(str);
+            //instance.dtm.Display(str);
         }
 
         [Conditional("KOITAN_DEBUG")]

@@ -10,7 +10,7 @@ namespace KoitanLib
     {
 
         //ゲーム開始時(シーン読み込み前)に実行される
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        //[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void LoadManagerScene()
         {
 #if KOITAN_DEBUG

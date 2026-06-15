@@ -34,7 +34,7 @@ namespace Koitan
 
         public override void FixedUpdateNetwork()
         {
-            Debug.Log($"[PlayerAvatar] FixedUpdateNetwork name={name}, HasInputAuthority={HasInputAuthority}");
+            //Debug.Log($"[PlayerAvatar] FixedUpdateNetwork name={name}, HasInputAuthority={HasInputAuthority}");
 
             if (!GetInput(out NetworkInputData input))
             {
@@ -42,7 +42,7 @@ namespace Koitan
                 return;
             }
 
-            Debug.Log($"[PlayerAvatar] input Stick={input.Stick}");
+            //Debug.Log($"[PlayerAvatar] input Stick={input.Stick}");
 
             float deltaTime = Runner.DeltaTime;
 
