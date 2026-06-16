@@ -1,6 +1,7 @@
-using Fusion;
-using UnityEngine;
+﻿using Fusion;
 using KoitanLib;
+using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace Koitan
 {
@@ -36,6 +37,12 @@ namespace Koitan
         public override void Render()
         {
             transform.localScale = FacingRight ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
+        }
+
+        public override void Spawned()
+        {
+            BattleManager.OnlinePlayers.Add(this);
+            BattleManager.instance.SetMoneyUIActive(PlayerIndex, true);   // ここプレイヤーカウント出すようにする
         }
 
         public override void FixedUpdateNetwork()
@@ -110,7 +117,7 @@ namespace Koitan
                 if (nearShop != null)
                 {
                     //nearShop.BuildShop(TeamIndex);
-                    nearShop.TryBuildShop(TeamIndex);   // �`�[��index�͂܂�
+                    nearShop.TryBuildShop(TeamIndex);   // チームindexはまだ
                 }
                 else if (grabedBomb != null)
                 {

@@ -13,7 +13,9 @@ namespace Koitan
     public class BattleManager : MonoBehaviour
     {
         List<PlayerController> players = new List<PlayerController>();
+        List<PlayerAvatar> onlinePlayers = new List<PlayerAvatar>();
         public static List<PlayerController> Players => instance.players;
+        public static List<PlayerAvatar> OnlinePlayers => instance.onlinePlayers;
         int[] moneys = new int[BattleGlobal.MaxPlayerNum];
         public static int[] Moneys => instance.moneys;
         [SerializeField]
@@ -118,6 +120,11 @@ namespace Koitan
             StartCoroutine(HagimariAnim());
         }
 
+        public void SetMoneyUIActive(int index, bool flag)
+        {
+            moneyUis[index].SetActive(flag);
+        }
+
         private void OnDestroy()
         {
             instance = null;
@@ -141,10 +148,8 @@ namespace Koitan
                 timerText.text = $"{mm}:{ss:D2}.{dd:D2}";
             }
 
-            for (int i = 0; i < players.Count; i++)
+            for (int i = 0; i < onlinePlayers.Count; i++)
             {
-                //KoitanDebug.DisplayBox($"{moneys[i]}", players[i]);
-                //KoitanDebug.Display($"ƒvƒŒƒCƒ„[{i}‚Ì‚¨‹à = {moneys[i]}\n");
                 moneyTexts[i].text = $"{moneys[i]}G";
             }
             KoitanDebug.Display($"MoneyInstances.Count = {moneyInstances.Count}");
