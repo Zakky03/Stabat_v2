@@ -49,19 +49,27 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
     {
         Debug.Log("[GameLauncher] OnSceneLoadDone");
 
+        PlayerRef player = runner.LocalPlayer;
+
+        int avatarIndex = player.PlayerId - 1;
+
         if (playerSpawned)
             return;
 
         playerSpawned = true;
 
-        var spawnPosition = BattleManager.instance.GetInitPosition(0).position;
+        var spawnPosition = BattleManager.instance.GetInitPosition(avatarIndex).position;
 
-        runner.Spawn(
+        NetworkObject obj = runner.Spawn(
             playerAvatarPrefab,
             spawnPosition,
             Quaternion.identity,
             inputAuthority: runner.LocalPlayer
         );
+
+        PlayerAvatar avatar = obj.GetComponent<PlayerAvatar>();
+
+        avatar.ChangeColor(avatarIndex, avatarIndex);
     }
 
     void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input)
@@ -76,26 +84,26 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
 
     void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        int avatarIndex = player.PlayerId - 1;
-
-        Debug.Log($"[Fusion] PlayerJoined player={player}, PlayerId={player.PlayerId}, avatarIndex={avatarIndex}");
-
-        if (player == runner.LocalPlayer)
-        {
-            var spawnPosition = BattleManager.instance.GetInitPosition(avatarIndex).position;
-
-            NetworkObject obj = runner.Spawn(
-                playerAvatarPrefab,
-                spawnPosition,
-                Quaternion.identity,
-                inputAuthority: player
-            );
-
-            PlayerAvatar avatar = obj.GetComponent<PlayerAvatar>();
-            avatar.ChangeColor(avatarIndex, avatarIndex);
-
-            Debug.Log($"[Fusion] Spawn Avatar index={avatarIndex}, name={obj.name}");
-        }
+        //int avatarIndex = player.PlayerId - 1;
+        //
+        //Debug.Log($"[Fusion] PlayerJoined player={player}, PlayerId={player.PlayerId}, avatarIndex={avatarIndex}");
+        //
+        //if (player == runner.LocalPlayer)
+        //{
+        //    var spawnPosition = BattleManager.instance.GetInitPosition(avatarIndex).position;
+        //
+        //    NetworkObject obj = runner.Spawn(
+        //        playerAvatarPrefab,
+        //        spawnPosition,
+        //        Quaternion.identity,
+        //        inputAuthority: player
+        //    );
+        //
+        //    PlayerAvatar avatar = obj.GetComponent<PlayerAvatar>();
+        //    avatar.ChangeColor(avatarIndex, avatarIndex);
+        //
+        //    Debug.Log($"[Fusion] Spawn Avatar index={avatarIndex}, name={obj.name}");
+        //}
     }
     void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
     void INetworkRunnerCallbacks.OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
