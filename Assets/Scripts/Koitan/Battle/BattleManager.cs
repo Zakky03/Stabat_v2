@@ -66,6 +66,7 @@ namespace Koitan
             if (instance == null)
             {
                 instance = this;
+                /*
                 for (int i = 0; i < BattleGlobal.MaxPlayerNum; i++)
                 {
                     if (BattleSetting.ControllPlayers[i] == 0) continue;
@@ -80,6 +81,7 @@ namespace Koitan
 
                     moneys[i] = 0;
                 }
+                */
 
                 /*
                 for (int i = 0; i < KoitanInput.GetControllerNum(); i++)
