@@ -21,6 +21,15 @@ namespace Koitan
         // (physics collisions can't fire while held anyway, since rb.simulated is false then).
         bool ignited;
 
+        // Local-only (not networked): set on the requesting client while waiting for
+        // Object.RequestStateAuthority() to actually grant authority, since that's a round trip.
+        bool pendingPickup;
+        PlayerAvatar pendingPicker;
+
+        // Only meaningful on whichever client currently HasStateAuthority; who the bomb should
+        // follow this tick while held. Read directly (no network lookup) once authority is transferred.
+        PlayerAvatar heldBy;
+
         public override void Spawned()
         {
             TryGetComponent(out rb);
@@ -29,14 +38,19 @@ namespace Koitan
 
         public override void FixedUpdateNetwork()
         {
+            if (pendingPickup && HasStateAuthority)
+            {
+                DoPick(pendingPicker);
+                pendingPickup = false;
+                pendingPicker = null;
+            }
+
             if (!HasStateAuthority)
                 return;
 
-            if (IsPicked)
+            if (IsPicked && heldBy != null)
             {
-                Transform holderHand = FindHolderHandTf();
-                if (holderHand != null)
-                    transform.position = holderHand.position;
+                transform.position = heldBy.HandTf.position;
             }
 
             if (despawnTimer.Expired(Runner))
@@ -46,67 +60,45 @@ namespace Koitan
             }
         }
 
-        Transform FindHolderHandTf()
-        {
-            foreach (PlayerAvatar avatar in BattleManager.OnlinePlayers)
-            {
-                if (avatar.PlayerIndex == HolderPlayerIndex)
-                    return avatar.HandTf;
-            }
-            return null;
-        }
-
-        // Bombs never transfer state authority (avoids depending on Fusion's "Allow State Authority
-        // Override" NetworkObject setting): the spawner keeps authority for the object's whole lifetime,
-        // and every other client routes pick/throw through an RPC to whoever that is.
         public void Pick(PlayerAvatar picker)
         {
             if (IsPicked)
                 return;
 
             if (HasStateAuthority)
-                DoPick(picker.PlayerIndex);
+            {
+                DoPick(picker);
+            }
             else
-                RPC_RequestPick(picker.PlayerIndex);
+            {
+                pendingPickup = true;
+                pendingPicker = picker;
+                Object.RequestStateAuthority();
+            }
         }
 
-        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-        private void RPC_RequestPick(int pickerPlayerIndex)
-        {
-            DoPick(pickerPlayerIndex);
-        }
-
-        void DoPick(int holderPlayerIndex)
+        void DoPick(PlayerAvatar picker)
         {
             if (IsPicked)
                 return;
 
             ignited = true;
+            heldBy = picker;
             rb.bodyType = RigidbodyType2D.Kinematic;
             rb.linearVelocity = Vector2.zero;
             rb.simulated = false;
 
-            HolderPlayerIndex = holderPlayerIndex;
+            HolderPlayerIndex = picker.PlayerIndex;
             IsPicked = true;
             IsThrown = false;
         }
 
         public void Throw(Vector3 speed)
         {
-            if (HasStateAuthority)
-                DoThrow(speed);
-            else
-                RPC_RequestThrow(speed);
-        }
+            if (!HasStateAuthority)
+                return;
 
-        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-        private void RPC_RequestThrow(Vector3 speed)
-        {
-            DoThrow(speed);
-        }
-
-        void DoThrow(Vector3 speed)
-        {
+            heldBy = null;
             rb.bodyType = RigidbodyType2D.Dynamic;
             rb.simulated = true;
             rb.linearVelocity = speed;
