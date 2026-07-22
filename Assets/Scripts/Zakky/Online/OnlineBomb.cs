@@ -32,6 +32,7 @@ namespace Koitan
         public override void Spawned()
         {
             TryGetComponent(out rb);
+            Debug.Log($"[OnlineBomb] Spawned name={name} HasStateAuthority={HasStateAuthority} IsProxy={Object.IsProxy} Id={Object.Id}");
         }
 
         public override void FixedUpdateNetwork()

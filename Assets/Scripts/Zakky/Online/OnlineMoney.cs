@@ -20,7 +20,10 @@ namespace Koitan
 
         public override void Spawned()
         {
-            IsGrowing = true;
+            Debug.Log($"[OnlineMoney] Spawned name={name} HasStateAuthority={HasStateAuthority} IsProxy={Object.IsProxy} Id={Object.Id}");
+
+            if (HasStateAuthority)
+                IsGrowing = true;
         }
 
         public override void FixedUpdateNetwork()
