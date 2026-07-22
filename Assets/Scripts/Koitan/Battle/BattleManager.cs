@@ -61,6 +61,9 @@ namespace Koitan
         [SerializeField]
         bool isOnlineBattle;
         NetworkRunner runner;
+        TextMeshProUGUI hagimariTMP;
+        string hagimariOriginalText;
+        bool hagimariStarted;
         BattleProgress battleProgress = BattleProgress.BeforeBattle;
         public static ShopController[] Shops => instance.shops;
         public static List<Money> moneyInstances = new List<Money>();
@@ -131,7 +134,18 @@ namespace Koitan
                     }
                 }
             }
-            StartCoroutine(HagimariAnim());
+
+            if (isOnlineBattle)
+            {
+                hagimariTMP = hagimariText.GetComponentInChildren<TextMeshProUGUI>(true);
+                if (hagimariTMP != null)
+                    hagimariOriginalText = hagimariTMP.text;
+                hagimariText.SetActive(true);
+            }
+            else
+            {
+                StartCoroutine(HagimariAnim());
+            }
         }
 
         public void SetMoneyUIActive(int index, bool flag)
@@ -147,6 +161,11 @@ namespace Koitan
         // Update is called once per frame
         void Update()
         {
+            if (isOnlineBattle && !hagimariStarted && battleProgress == BattleProgress.BeforeBattle)
+            {
+                UpdateReadyStatus();
+            }
+
             // �^�C�}�[����
             if (battleProgress == BattleProgress.Battle)
             {
@@ -185,6 +204,27 @@ namespace Koitan
                 CreateItem();
             }
 
+        }
+
+        void UpdateReadyStatus()
+        {
+            int readyCount = 0;
+            for (int i = 0; i < onlinePlayers.Count; i++)
+            {
+                if (onlinePlayers[i].IsReady)
+                    readyCount++;
+            }
+
+            if (hagimariTMP != null)
+                hagimariTMP.text = $"Ready {readyCount}/{onlinePlayers.Count}\n(Press Start)";
+
+            if (onlinePlayers.Count > 0 && readyCount == onlinePlayers.Count)
+            {
+                hagimariStarted = true;
+                if (hagimariTMP != null)
+                    hagimariTMP.text = hagimariOriginalText;
+                StartCoroutine(HagimariAnim());
+            }
         }
 
         void CreateItem()

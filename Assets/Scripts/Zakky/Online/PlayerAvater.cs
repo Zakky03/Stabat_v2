@@ -9,6 +9,7 @@ namespace Koitan
         [Networked] public int PlayerIndex { get; set; }
         [Networked] public int TeamIndex { get; set; } = -1;
         [Networked] public int Money { get; set; }
+        [Networked] public NetworkBool IsReady { get; set; }
         [Networked] private NetworkBool FacingRight { get; set; } = true;
 
         private Animator animator;
@@ -67,6 +68,11 @@ namespace Koitan
             }
 
             //Debug.Log($"[PlayerAvatar] input Stick={input.Stick}");
+
+            if (!IsReady && input.Buttons.WasPressed(previousButtons, PlayerButtons.Ready))
+            {
+                IsReady = true;
+            }
 
             float deltaTime = Runner.DeltaTime;
 

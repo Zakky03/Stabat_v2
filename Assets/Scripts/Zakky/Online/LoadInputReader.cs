@@ -10,11 +10,13 @@ public class LocalInputReader : MonoBehaviour
     private InputAction moveAction;
     private InputAction jumpAction;
     private InputAction attackAction;
+    private InputAction startAction;
 
     public Vector2 Stick { get; private set; }
     public bool JumpPressed { get; private set; }
     public bool JumpHeld { get; private set; }
     public bool AttackPressed { get; private set; }
+    public bool StartPressed { get; private set; }
 
     private void Awake()
     {
@@ -29,6 +31,7 @@ public class LocalInputReader : MonoBehaviour
         moveAction = actions.FindAction("Stick", true);
         jumpAction = actions.FindAction("B", false);
         attackAction = actions.FindAction("A", false);
+        startAction = actions.FindAction("Start", false);
     }
 
     private void OnEnable()
@@ -49,6 +52,7 @@ public class LocalInputReader : MonoBehaviour
         JumpHeld = jumpAction.IsPressed();
 
         AttackPressed |= attackAction != null && attackAction.WasPressedThisFrame();
+        StartPressed |= startAction != null && startAction.WasPressedThisFrame();
     }
 
     public NetworkInputData ConsumeFusionInput()
@@ -60,9 +64,11 @@ public class LocalInputReader : MonoBehaviour
 
         data.Buttons.Set(PlayerButtons.Jump, JumpPressed || JumpHeld);
         data.Buttons.Set(PlayerButtons.Action, AttackPressed);
+        data.Buttons.Set(PlayerButtons.Ready, StartPressed);
 
         JumpPressed = false;
         AttackPressed = false;
+        StartPressed = false;
 
         return data;
     }
