@@ -30,13 +30,16 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
         var result = await runner.StartGame(new StartGameArgs
         {
             GameMode = GameMode.Shared,
-            SceneManager = sceneManager
+            SceneManager = sceneManager,
+            PlayerCount = BattleGlobal.MaxPlayerNum
         });
 
         Debug.Log($"[GameLauncher] StartGame result={result.Ok}, reason={result.ShutdownReason}");
 
         if (!result.Ok)
             return;
+
+        BattleManager.instance.SetRunner(runner);
 
         if (runner.IsSceneAuthority)
         {
@@ -52,6 +55,12 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
         PlayerRef player = runner.LocalPlayer;
 
         int avatarIndex = player.PlayerId - 1;
+
+        if (avatarIndex < 0 || avatarIndex >= BattleGlobal.MaxPlayerNum)
+        {
+            Debug.LogWarning($"[GameLauncher] Room full, not spawning avatar. avatarIndex={avatarIndex}");
+            return;
+        }
 
         if (playerSpawned)
             return;

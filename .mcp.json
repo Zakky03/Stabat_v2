@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "mcp-unity": {
+      "command": "node",
+      "args": [
+        "Library/PackageCache/com.gamelovers.mcp-unity@c35f184d7656/Server~/build/index.js"
+      ],
+      "env": {
+        "UNITY_PORT": "8070"
+      }
+    }
+  }
+}

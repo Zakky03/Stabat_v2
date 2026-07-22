@@ -1,7 +1,6 @@
 ﻿using Fusion;
 using KoitanLib;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace Koitan
 {
@@ -9,6 +8,7 @@ namespace Koitan
     {
         [Networked] public int PlayerIndex { get; set; }
         [Networked] public int TeamIndex { get; set; } = -1;
+        [Networked] public int Money { get; set; }
         [Networked] private NetworkBool FacingRight { get; set; } = true;
 
         private Animator animator;
@@ -19,8 +19,8 @@ namespace Koitan
         [SerializeField] private Transform handTf;
 
         private OnlineShopController nearShop = null;
-        private Bomb nearBomb = null;
-        private Bomb grabedBomb = null;
+        private OnlineBomb nearBomb = null;
+        private OnlineBomb grabedBomb = null;
 
         private float inoperableTime = 0f;
         private float invincibleTime = 0f;
@@ -43,6 +43,14 @@ namespace Koitan
         {
             BattleManager.OnlinePlayers.Add(this);
             BattleManager.instance.SetMoneyUIActive(PlayerIndex, true);   // ここプレイヤーカウント出すようにする
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            BattleManager.OnlinePlayers.Remove(this);
+
+            if (BattleManager.instance != null)
+                BattleManager.instance.SetMoneyUIActive(PlayerIndex, false);
         }
 
         public override void FixedUpdateNetwork()
@@ -126,7 +134,7 @@ namespace Koitan
                 }
                 else if (nearBomb != null)
                 {
-                    nearBomb.Pick(handTf, PlayerIndex);
+                    nearBomb.Pick(handTf, this);
                     grabedBomb = nearBomb;
                     nearBomb = null;
                 }
@@ -212,7 +220,7 @@ namespace Koitan
                 case "Bomb":
                     if (nearBomb == null)
                     {
-                        nearBomb = collision.transform.parent.GetComponent<Bomb>();
+                        nearBomb = collision.transform.parent.GetComponent<OnlineBomb>();
                     }
                     break;
             }
@@ -234,15 +242,30 @@ namespace Koitan
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
+            if (!HasStateAuthority)
+                return;
+
             if (collision.collider.CompareTag("Money"))
             {
-                Money money = collision.collider.GetComponentInParent<Money>();
+                OnlineMoney money = collision.collider.GetComponentInParent<OnlineMoney>();
 
-                if (money.IsGetable(TeamIndex))
+                if (money != null)
                 {
-                    BattleManager.Moneys[PlayerIndex] += (int)money.GetMoney();
+                    money.TryPickup(TeamIndex);
                 }
             }
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        public void RPC_ApplyDamage(Vector2 vec, float time)
+        {
+            SetDamage(vec, time);
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        public void RPC_CreditMoney(int amount)
+        {
+            Money += amount;
         }
     }
 }

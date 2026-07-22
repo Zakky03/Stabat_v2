@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.Android;
+using Fusion;
 
 namespace Koitan
 {
@@ -22,7 +23,7 @@ namespace Koitan
         CinemachineTargetGroup targetGroup;
         [SerializeField]
         Money moneyPrefab;
-        //‚±‚Ì‘‚«•û’´•Ö—˜
+        //ï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö—ï¿½
         public static CinemachineTargetGroup TargetGroup => instance.targetGroup;
         public static BattleManager instance { private set; get; }
         [SerializeField]
@@ -57,6 +58,9 @@ namespace Koitan
         GameObject owariText;
         [SerializeField]
         GameObject hagimariText;
+        [SerializeField]
+        bool isOnlineBattle;
+        NetworkRunner runner;
         BattleProgress battleProgress = BattleProgress.BeforeBattle;
         public static ShopController[] Shops => instance.shops;
         public static List<Money> moneyInstances = new List<Money>();
@@ -104,19 +108,27 @@ namespace Koitan
             return initPositions[index];
         }
 
+        public void SetRunner(NetworkRunner runner)
+        {
+            this.runner = runner;
+        }
+
         private void Start()
         {
-            //UI‚Ì•\¦
-            for (int i = 0; i < BattleGlobal.MaxPlayerNum; i++)
+            // Online: each PlayerAvatar toggles its own moneyUis slot on Spawned/Despawned instead.
+            if (!isOnlineBattle)
             {
-                if (i < players.Count)
+                for (int i = 0; i < BattleGlobal.MaxPlayerNum; i++)
                 {
-                    moneyUis[i].SetActive(true);
-                    moneyUis[i].transform.localPosition = new Vector3(1920 / players.Count * (i + 0.5f) - 960, -420);
-                }
-                else
-                {
-                    moneyUis[i].SetActive(false);
+                    if (i < players.Count)
+                    {
+                        moneyUis[i].SetActive(true);
+                        moneyUis[i].transform.localPosition = new Vector3(1920 / players.Count * (i + 0.5f) - 960, -420);
+                    }
+                    else
+                    {
+                        moneyUis[i].SetActive(false);
+                    }
                 }
             }
             StartCoroutine(HagimariAnim());
@@ -135,7 +147,7 @@ namespace Koitan
         // Update is called once per frame
         void Update()
         {
-            // ƒ^ƒCƒ}[ˆ—
+            // ï¿½^ï¿½Cï¿½}ï¿½[ï¿½ï¿½ï¿½ï¿½
             if (battleProgress == BattleProgress.Battle)
             {
                 limitSeconds -= Time.deltaTime;
@@ -150,9 +162,20 @@ namespace Koitan
                 timerText.text = $"{mm}:{ss:D2}.{dd:D2}";
             }
 
-            for (int i = 0; i < onlinePlayers.Count; i++)
+            if (isOnlineBattle)
             {
-                moneyTexts[i].text = $"{moneys[i]}G";
+                for (int i = 0; i < onlinePlayers.Count; i++)
+                {
+                    PlayerAvatar avatar = onlinePlayers[i];
+                    moneyTexts[avatar.PlayerIndex].text = $"{avatar.Money}G";
+                }
+            }
+            else
+            {
+                for (int i = 0; i < players.Count; i++)
+                {
+                    moneyTexts[i].text = $"{moneys[i]}G";
+                }
             }
             KoitanDebug.Display($"MoneyInstances.Count = {moneyInstances.Count}");
             itemCreateTime += Time.deltaTime;
@@ -166,8 +189,11 @@ namespace Koitan
 
         void CreateItem()
         {
+            if (isOnlineBattle && (runner == null || !runner.IsSceneAuthority))
+                return;
+
             GameObject item = items[Random.Range(0, items.Length)];
-            //100‰ñ‚Å‘Å‚¿Ø‚è
+            //100ï¿½ï¿½Å‘Å‚ï¿½ï¿½Ø‚ï¿½
             for (int i = 0; i < 100; i++)
             {
                 Vector2 pos = new Vector2(Random.Range(-stageWidth / 2, stageWidth / 2), Random.Range(-stageHeight / 2, stageHeight / 2));
@@ -175,7 +201,16 @@ namespace Koitan
                 hit = Physics2D.BoxCast(pos, Vector2.one, 0, Vector2.zero);
                 if (!hit)
                 {
-                    Instantiate(item, pos, Quaternion.identity);
+                    if (isOnlineBattle)
+                    {
+                        NetworkObject networkItem = item.GetComponent<NetworkObject>();
+                        if (networkItem != null)
+                            runner.Spawn(networkItem, pos, Quaternion.identity);
+                    }
+                    else
+                    {
+                        Instantiate(item, pos, Quaternion.identity);
+                    }
                     break;
                 }
             }
@@ -194,17 +229,29 @@ namespace Koitan
             owariText.SetActive(true);
             battleProgress = BattleProgress.AfterBattle;
             yield return new WaitForSeconds(2f);
-            // ƒŠƒUƒ‹ƒg‚Éî•ñ‚ğ“n‚·
-            Result.playerCount = players.Count;
-            for (int i = 0; i < players.Count; i++)
+            // ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½gï¿½Éï¿½ï¿½ï¿½nï¿½ï¿½
+            if (isOnlineBattle)
             {
-                Result.playerMoneys[i] = moneys[i];
+                Result.playerCount = onlinePlayers.Count;
+                for (int i = 0; i < onlinePlayers.Count; i++)
+                {
+                    PlayerAvatar avatar = onlinePlayers[i];
+                    Result.playerMoneys[avatar.PlayerIndex] = avatar.Money;
+                }
+            }
+            else
+            {
+                Result.playerCount = players.Count;
+                for (int i = 0; i < players.Count; i++)
+                {
+                    Result.playerMoneys[i] = moneys[i];
+                }
             }
             SceneManager.LoadScene("Result");
         }
 
         /// <summary>
-        /// ‚¨‹à‚ğ¶¬‚·‚é
+        /// ï¿½ï¿½ï¿½ï¿½ï¿½ğ¶ï¿½ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="pos"></param>
         /// <returns></returns>
@@ -216,7 +263,7 @@ namespace Koitan
         }
 
         /// <summary>
-        /// ‚¨‹à‚ğ”jŠü‚·‚é
+        /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="money"></param>
         public static void DestroyMoney(Money money)
