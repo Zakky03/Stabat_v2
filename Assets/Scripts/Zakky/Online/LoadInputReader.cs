@@ -39,6 +39,15 @@ public class LocalInputReader : MonoBehaviour
         actions.Enable();
     }
 
+    // Clears any button state latched before this call (e.g. an Enter/Start press made while
+    // confirming a browser/page prompt prior to actually reaching the ready-check).
+    public void ClearLatchedInput()
+    {
+        JumpPressed = false;
+        AttackPressed = false;
+        StartPressed = false;
+    }
+
     private void OnDisable()
     {
         actions.Disable();

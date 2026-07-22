@@ -137,6 +137,9 @@ namespace Koitan
 
             if (isOnlineBattle)
             {
+                if (LocalInputReader.Instance != null)
+                    LocalInputReader.Instance.ClearLatchedInput();
+
                 hagimariTMP = hagimariText.GetComponentInChildren<TextMeshProUGUI>(true);
                 if (hagimariTMP != null)
                     hagimariOriginalText = hagimariTMP.text;
