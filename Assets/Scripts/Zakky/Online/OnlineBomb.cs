@@ -17,17 +17,9 @@ namespace Koitan
         [Networked] public int HolderPlayerIndex { get; set; } = -1;
         [Networked] private TickTimer despawnTimer { get; set; }
 
-        // Only meaningful on the current state authority; drives the "follow the holder's hand" behaviour
-        // every tick since NetworkObjects must not be Transform-parented under another networked object.
-        Transform heldHandTf;
-
         // Mirrors offline Bomb's "isIgnited": stays true from the moment it's first picked up
         // (physics collisions can't fire while held anyway, since rb.simulated is false then).
         bool ignited;
-
-        bool pendingPickup;
-        Transform pendingHandTf;
-        int pendingHolderPlayerIndex;
 
         public override void Spawned()
         {
@@ -37,48 +29,59 @@ namespace Koitan
 
         public override void FixedUpdateNetwork()
         {
-            if (pendingPickup && HasStateAuthority)
+            if (!HasStateAuthority)
+                return;
+
+            if (IsPicked)
             {
-                DoPick(pendingHandTf, pendingHolderPlayerIndex);
-                pendingPickup = false;
-                pendingHandTf = null;
+                Transform holderHand = FindHolderHandTf();
+                if (holderHand != null)
+                    transform.position = holderHand.position;
             }
 
-            if (HasStateAuthority && IsPicked && heldHandTf != null)
-            {
-                transform.position = heldHandTf.position;
-            }
-
-            if (HasStateAuthority && despawnTimer.Expired(Runner))
+            if (despawnTimer.Expired(Runner))
             {
                 despawnTimer = TickTimer.None;
                 Runner.Despawn(Object);
             }
         }
 
-        public void Pick(Transform handTf, PlayerAvatar picker)
+        Transform FindHolderHandTf()
+        {
+            foreach (PlayerAvatar avatar in BattleManager.OnlinePlayers)
+            {
+                if (avatar.PlayerIndex == HolderPlayerIndex)
+                    return avatar.HandTf;
+            }
+            return null;
+        }
+
+        // Bombs never transfer state authority (avoids depending on Fusion's "Allow State Authority
+        // Override" NetworkObject setting): the spawner keeps authority for the object's whole lifetime,
+        // and every other client routes pick/throw through an RPC to whoever that is.
+        public void Pick(PlayerAvatar picker)
         {
             if (IsPicked)
                 return;
 
             if (HasStateAuthority)
-            {
-                DoPick(handTf, picker.PlayerIndex);
-            }
+                DoPick(picker.PlayerIndex);
             else
-            {
-                pendingPickup = true;
-                pendingHandTf = handTf;
-                pendingHolderPlayerIndex = picker.PlayerIndex;
-                Object.RequestStateAuthority();
-            }
+                RPC_RequestPick(picker.PlayerIndex);
         }
 
-        void DoPick(Transform handTf, int holderPlayerIndex)
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        private void RPC_RequestPick(int pickerPlayerIndex)
         {
+            DoPick(pickerPlayerIndex);
+        }
+
+        void DoPick(int holderPlayerIndex)
+        {
+            if (IsPicked)
+                return;
+
             ignited = true;
-            heldHandTf = handTf;
-            transform.position = handTf.position;
             rb.bodyType = RigidbodyType2D.Kinematic;
             rb.linearVelocity = Vector2.zero;
             rb.simulated = false;
@@ -90,10 +93,20 @@ namespace Koitan
 
         public void Throw(Vector3 speed)
         {
-            if (!HasStateAuthority)
-                return;
+            if (HasStateAuthority)
+                DoThrow(speed);
+            else
+                RPC_RequestThrow(speed);
+        }
 
-            heldHandTf = null;
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        private void RPC_RequestThrow(Vector3 speed)
+        {
+            DoThrow(speed);
+        }
+
+        void DoThrow(Vector3 speed)
+        {
             rb.bodyType = RigidbodyType2D.Dynamic;
             rb.simulated = true;
             rb.linearVelocity = speed;
@@ -110,7 +123,6 @@ namespace Koitan
             if (IsFired)
                 return;
 
-            heldHandTf = null;
             rb.bodyType = RigidbodyType2D.Kinematic;
             rb.linearVelocity = Vector2.zero;
             IsFired = true;

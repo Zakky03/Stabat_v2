@@ -18,6 +18,7 @@ namespace Koitan
 
         [SerializeField] private CharaLibrarySets librarySets;
         [SerializeField] private Transform handTf;
+        public Transform HandTf => handTf;
 
         private OnlineShopController nearShop = null;
         private OnlineBomb nearBomb = null;
@@ -140,7 +141,7 @@ namespace Koitan
                 }
                 else if (nearBomb != null)
                 {
-                    nearBomb.Pick(handTf, this);
+                    nearBomb.Pick(this);
                     grabedBomb = nearBomb;
                     nearBomb = null;
                 }
