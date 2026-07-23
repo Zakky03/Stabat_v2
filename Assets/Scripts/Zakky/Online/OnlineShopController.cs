@@ -25,7 +25,6 @@ namespace Koitan
 
         public override void Spawned()
         {
-            Debug.Log($"[OnlineShopController] Spawned name={name} HasStateAuthority={HasStateAuthority} IsProxy={Object.IsProxy} Id={Object.Id}");
             ApplyVisual(true);
         }
 

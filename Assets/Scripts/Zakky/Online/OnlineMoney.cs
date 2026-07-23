@@ -7,6 +7,8 @@ namespace Koitan
     {
         [SerializeField] SpriteRenderer outline;
 
+        Rigidbody2D rb;
+
         const float ValueMin = 1000f;
         const float ValueMax = 10000f;
         const float ScaleMin = 1f;
@@ -20,7 +22,12 @@ namespace Koitan
 
         public override void Spawned()
         {
-            Debug.Log($"[OnlineMoney] Spawned name={name} HasStateAuthority={HasStateAuthority} IsProxy={Object.IsProxy} Id={Object.Id}");
+            TryGetComponent(out rb);
+
+            // See OnlineBomb.Spawned(): NetworkTransform doesn't disable local physics on proxies,
+            // so non-authority clients must not run their own simulation of this Rigidbody2D.
+            if (!HasStateAuthority && rb != null)
+                rb.simulated = false;
 
             if (HasStateAuthority)
                 IsGrowing = true;

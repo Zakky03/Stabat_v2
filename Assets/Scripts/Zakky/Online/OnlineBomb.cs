@@ -16,6 +16,9 @@ namespace Koitan
         [Networked] public NetworkBool IsFired { get; set; }
         [Networked] public int HolderPlayerIndex { get; set; } = -1;
         [Networked] private TickTimer despawnTimer { get; set; }
+        [Networked] private TickTimer idleDespawnTimer { get; set; }
+
+        const float IdleLifetimeSeconds = 20f;
 
         // Mirrors offline Bomb's "isIgnited": stays true from the moment it's first picked up
         // (physics collisions can't fire while held anyway, since rb.simulated is false then).
@@ -26,14 +29,24 @@ namespace Koitan
         bool pendingPickup;
         PlayerAvatar pendingPicker;
 
-        // Only meaningful on whichever client currently HasStateAuthority; who the bomb should
-        // follow this tick while held. Read directly (no network lookup) once authority is transferred.
-        PlayerAvatar heldBy;
-
         public override void Spawned()
         {
             TryGetComponent(out rb);
-            Debug.Log($"[OnlineBomb] Spawned name={name} HasStateAuthority={HasStateAuthority} IsProxy={Object.IsProxy} Id={Object.Id}");
+
+            // NetworkTransform only syncs position — it does not disable local physics on proxies.
+            // Without this, every non-authority client keeps simulating this Rigidbody2D locally
+            // (still Dynamic from the prefab's default) while NetworkTransform simultaneously
+            // overwrites its position from the network, and the two fight every frame.
+            if (!HasStateAuthority)
+                rb.simulated = false;
+
+            if (HasStateAuthority)
+                idleDespawnTimer = TickTimer.CreateFromSeconds(Runner, IdleLifetimeSeconds);
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            BattleManager.NotifyOnlineItemDespawned();
         }
 
         public override void FixedUpdateNetwork()
@@ -48,14 +61,17 @@ namespace Koitan
             if (!HasStateAuthority)
                 return;
 
-            if (IsPicked && heldBy != null)
-            {
-                transform.position = heldBy.HandTf.position;
-            }
-
             if (despawnTimer.Expired(Runner))
             {
                 despawnTimer = TickTimer.None;
+                Runner.Despawn(Object);
+                return;
+            }
+
+            // Nobody's holding it (whether it's still sitting where it spawned, or was thrown and
+            // never exploded): clear it out after a while instead of letting items pile up forever.
+            if (!IsPicked && idleDespawnTimer.Expired(Runner))
+            {
                 Runner.Despawn(Object);
             }
         }
@@ -83,7 +99,6 @@ namespace Koitan
                 return;
 
             ignited = true;
-            heldBy = picker;
             rb.bodyType = RigidbodyType2D.Kinematic;
             rb.linearVelocity = Vector2.zero;
             rb.simulated = false;
@@ -98,7 +113,7 @@ namespace Koitan
             if (!HasStateAuthority)
                 return;
 
-            heldBy = null;
+            idleDespawnTimer = TickTimer.CreateFromSeconds(Runner, IdleLifetimeSeconds);
             rb.bodyType = RigidbodyType2D.Dynamic;
             rb.simulated = true;
             rb.linearVelocity = speed;
@@ -123,6 +138,21 @@ namespace Koitan
 
         public override void Render()
         {
+            // While held, every client (not just the state authority) derives position directly
+            // from the holder's own avatar, which is already networked — no extra NetworkTransform
+            // hop for the bomb itself needed for this state, and no latency for the holder.
+            if (IsPicked)
+            {
+                foreach (PlayerAvatar avatar in BattleManager.OnlinePlayers)
+                {
+                    if (avatar.PlayerIndex == HolderPlayerIndex)
+                    {
+                        transform.position = avatar.HandTf.position;
+                        break;
+                    }
+                }
+            }
+
             body.SetActive(!IsFired);
             itemArea.SetActive(!IsFired);
             eff.SetActive(IsFired);

@@ -1559,6 +1559,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Koitan.PlayerAvatar
   _PlayerIndex: 0
   _TeamIndex: -1
+  _Money: 0
+  _IsReady:
+    RawValue: 0
   librarySets: {fileID: 11400000, guid: c3c4f0eae32b8f0498f0a15b2ec8aeb4, type: 2}
   handTf: {fileID: 338428583751148422}
 --- !u!50 &338428582370640900
@@ -1616,12 +1619,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
   SortKey: 135287090
-  ObjectInterest: 1
-  Flags: 262145
+  SendPriority: 1
+  EnableInterpolation: 1
+  Flags: 262402
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: -1096285119372020428}
   - {fileID: 4180648776022957152}
+  - {fileID: -1096285119372020428}
   - {fileID: 7701973489574150495}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &4180648776022957152
@@ -1640,7 +1644,30 @@ MonoBehaviour:
   SyncScale: 0
   SyncParent: 0
   _autoAOIOverride: 1
-  DisableSharedModeInterpolation: 1
+  ConfigFlags: 1
+  PhysicsSettings:
+    ForecastEnabled: 0
+    DebugPhysics: 0
+    GravityForecast: 2
+    MaxExtrapolationTime: 0.15
+    MinLinearDetectedError: 0.02
+    MinAngularDetectedError: 3
+    MaxLinearError: 0
+    MaxAngularError: 0
+    LowCorrectionProgressThreshold: 0.015
+    HighErrorSimilarityThreshold: 1
+    MaxErrorTotalTime: 0.5
+    MaxRemoteSleepIgnoreTime: 0.5
+    ErrorCorrectionType: 0
+    LinearVelCorrectionMul: 1
+    AngularVelCorrectionMul: 1
+    PositionCorrectionLerp: 0.15
+    RotationCorrectionLerp: 0.15
+    Spring: 75
+    Damper: 2
+    MinImpactfulCollisionAlignment: 0.3
+    ImpactStartCorrectionTime: 0.1
+    ImpactCorrectionTimeComplete: 0.3
 --- !u!114 &7701973489574150495
 MonoBehaviour:
   m_ObjectHideFlags: 0

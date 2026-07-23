@@ -39,8 +39,6 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
         if (!result.Ok)
             return;
 
-        BattleManager.instance.SetRunner(runner);
-
         if (runner.IsSceneAuthority)
         {
             Debug.Log($"[GameLauncher] LoadScene index={onlineBattleSceneBuildIndex}");
@@ -51,6 +49,12 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
     void INetworkRunnerCallbacks.OnSceneLoadDone(NetworkRunner runner)
     {
         Debug.Log("[GameLauncher] OnSceneLoadDone");
+
+        // Must happen here, not right after StartGame(): runner.LoadScene() reloads the whole
+        // scene (GameLauncher lives inside it), which destroys whatever BattleManager existed
+        // before the reload. This callback only fires once the reload has actually settled, so
+        // BattleManager.instance here is guaranteed to be the surviving one.
+        BattleManager.instance.SetRunner(runner);
 
         PlayerRef player = runner.LocalPlayer;
 
@@ -127,7 +131,7 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
     void INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
     void INetworkRunnerCallbacks.OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     void INetworkRunnerCallbacks.OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-    void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
+    void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ReadOnlySpan<byte> data) { }
     void INetworkRunnerCallbacks.OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
     void INetworkRunnerCallbacks.OnSceneLoadStart(NetworkRunner runner) { }
 }
