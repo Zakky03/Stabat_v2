@@ -133,16 +133,9 @@ namespace Koitan
                     }
                 }
             }
-            else
-            {
-                // Each PlayerAvatar toggles its own slot on via SetMoneyUIActive when it spawns (and
-                // off again on Despawned) — but the scene's moneyUis GameObjects default to active,
-                // so without this, slots for players who never join stay visibly on forever.
-                for (int i = 0; i < BattleGlobal.MaxPlayerNum; i++)
-                {
-                    moneyUis[i].SetActive(false);
-                }
-            }
+            // Online: moneyUis visibility is recomputed from onlinePlayers every frame in Update()
+            // instead, since scene objects default to active and no single one-time toggle here
+            // could reliably account for avatars that spawn (or leave) after this point.
 
             // Online: hagimariText is the "3, 2, 1, Go!" countdown banner played once everyone is
             // ready (see HagimariAnim()) — it must stay hidden during the waiting phase itself,
@@ -156,11 +149,6 @@ namespace Koitan
             {
                 StartCoroutine(HagimariAnim());
             }
-        }
-
-        public void SetMoneyUIActive(int index, bool flag)
-        {
-            moneyUis[index].SetActive(flag);
         }
 
         private void OnDestroy()
@@ -193,14 +181,28 @@ namespace Koitan
 
             if (isOnlineBattle)
             {
+                // Recomputed from onlinePlayers every frame (not just toggled once from
+                // Spawned()/Despawned()) so a slot's visibility can never end up depending on
+                // whether Start()'s initial "hide all" happened to run before or after a given
+                // avatar's Spawned() on this particular client — which previously showed every
+                // slot correctly on one side but only the local one on a client that joined later.
+                bool[] hasPlayer = new bool[BattleGlobal.MaxPlayerNum];
+
                 for (int i = 0; i < onlinePlayers.Count; i++)
                 {
                     PlayerAvatar avatar = onlinePlayers[i];
+                    hasPlayer[avatar.PlayerIndex] = true;
+
                     TextMeshProUGUI text = moneyTexts[avatar.PlayerIndex];
                     // Keep the string short (auto-sizing only has so much room to shrink into) —
                     // mark "yours" with color instead of appending text like "(YOU)".
                     text.text = $"P{avatar.PlayerIndex + 1}: {avatar.Money}G";
                     text.color = avatar.HasInputAuthority ? Color.yellow : Color.white;
+                }
+
+                for (int i = 0; i < BattleGlobal.MaxPlayerNum; i++)
+                {
+                    moneyUis[i].SetActive(hasPlayer[i]);
                 }
             }
             else

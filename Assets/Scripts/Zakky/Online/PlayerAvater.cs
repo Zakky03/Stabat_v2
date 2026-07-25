@@ -43,8 +43,9 @@ namespace Koitan
 
         public override void Spawned()
         {
+            // moneyUis visibility is recomputed every frame from BattleManager.OnlinePlayers
+            // (see BattleManager.Update()), so adding to that list is all that's needed here.
             BattleManager.OnlinePlayers.Add(this);
-            BattleManager.instance.SetMoneyUIActive(PlayerIndex, true);   // ここプレイヤーカウント出すようにする
 
             // Same weight/radius as the offline camera setup — offline players are pre-placed scene
             // objects, but online avatars are spawned dynamically by Fusion, so they must register
@@ -56,9 +57,6 @@ namespace Koitan
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
             BattleManager.OnlinePlayers.Remove(this);
-
-            if (BattleManager.instance != null)
-                BattleManager.instance.SetMoneyUIActive(PlayerIndex, false);
 
             if (BattleManager.TargetGroup != null)
                 BattleManager.TargetGroup.RemoveMember(transform);
