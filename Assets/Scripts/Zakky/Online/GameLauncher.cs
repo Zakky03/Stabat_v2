@@ -3,6 +3,7 @@ using Fusion.Sockets;
 using Koitan;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -58,7 +59,20 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
 
         PlayerRef player = runner.LocalPlayer;
 
-        int avatarIndex = player.PlayerId - 1;
+        // PlayerRef.PlayerId is Photon's raw ActorNumber: it keeps climbing with every join this
+        // room has ever seen (across the room's whole lifetime), it does not reflect how many
+        // players are *currently* connected. Using it directly as a seat index meant a handful of
+        // repeated Play/Stop cycles against the same lingering room could push it past
+        // MaxPlayerNum even with only one real player connected, tripping the room-full guard below
+        // and silently spawning no avatar at all. Rank among currently-active players instead.
+        int avatarIndex = 0;
+        foreach (PlayerRef activePlayer in runner.ActivePlayers.OrderBy(p => p.PlayerId))
+        {
+            if (activePlayer == player)
+                break;
+
+            avatarIndex++;
+        }
 
         if (avatarIndex < 0 || avatarIndex >= BattleGlobal.MaxPlayerNum)
         {

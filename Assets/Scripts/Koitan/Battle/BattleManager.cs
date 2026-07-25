@@ -45,9 +45,6 @@ namespace Koitan
         float intervalTime;
         float itemCreateTime;
         [SerializeField]
-        int maxOnlineItems = 3;
-        int activeOnlineItemCount;
-        [SerializeField]
         ShopController[] shops;
         [SerializeField]
         TextMeshProUGUI[] moneyTexts;
@@ -236,9 +233,6 @@ namespace Koitan
             {
                 if (runner == null || !runner.IsSceneAuthority)
                     return;
-
-                if (activeOnlineItemCount >= maxOnlineItems)
-                    return;
             }
 
             GameObject item = items[Random.Range(0, items.Length)];
@@ -256,7 +250,6 @@ namespace Koitan
                         if (networkItem != null)
                         {
                             runner.Spawn(networkItem, pos, Quaternion.identity);
-                            activeOnlineItemCount++;
                         }
                     }
                     else
@@ -266,14 +259,6 @@ namespace Koitan
                     break;
                 }
             }
-        }
-
-        // Called by online item scripts (e.g. OnlineBomb) when their NetworkObject despawns,
-        // so CreateItem()'s cap tracks how many are actually still alive.
-        public static void NotifyOnlineItemDespawned()
-        {
-            if (instance != null && instance.activeOnlineItemCount > 0)
-                instance.activeOnlineItemCount--;
         }
 
         IEnumerator HagimariAnim()

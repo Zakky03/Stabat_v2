@@ -62,11 +62,6 @@ namespace Koitan
                 : RigidbodyType2D.Kinematic;
         }
 
-        public override void Despawned(NetworkRunner runner, bool hasState)
-        {
-            BattleManager.NotifyOnlineItemDespawned();
-        }
-
         public override void FixedUpdateNetwork()
         {
             if (pendingPickup && HasStateAuthority)

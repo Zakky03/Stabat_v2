@@ -45,6 +45,12 @@ namespace Koitan
         {
             BattleManager.OnlinePlayers.Add(this);
             BattleManager.instance.SetMoneyUIActive(PlayerIndex, true);   // ここプレイヤーカウント出すようにする
+
+            // Same weight/radius as the offline camera setup — offline players are pre-placed scene
+            // objects, but online avatars are spawned dynamically by Fusion, so they must register
+            // with the follow camera's target group themselves instead of being wired in the Editor.
+            if (BattleManager.TargetGroup != null)
+                BattleManager.TargetGroup.AddMember(transform, 1f, 3f);
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
@@ -53,6 +59,9 @@ namespace Koitan
 
             if (BattleManager.instance != null)
                 BattleManager.instance.SetMoneyUIActive(PlayerIndex, false);
+
+            if (BattleManager.TargetGroup != null)
+                BattleManager.TargetGroup.RemoveMember(transform);
         }
 
         public override void FixedUpdateNetwork()
