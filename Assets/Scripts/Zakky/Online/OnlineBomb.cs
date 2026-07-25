@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Koitan
 {
-    public class OnlineBomb : NetworkBehaviour
+    public class OnlineBomb : NetworkBehaviour, IStateAuthorityChanged
     {
         Rigidbody2D rb;
         [SerializeField] GameObject body;
@@ -37,11 +37,29 @@ namespace Koitan
             // Without this, every non-authority client keeps simulating this Rigidbody2D locally
             // (still Dynamic from the prefab's default) while NetworkTransform simultaneously
             // overwrites its position from the network, and the two fight every frame.
+            // Kinematic (not simulated=false) is used so this object still generates trigger/collision
+            // callbacks on every client — simulated=false switches physics off for it entirely, which
+            // silently breaks the OnTriggerStay2D pickup detection on any client that isn't currently
+            // the state authority.
             if (!HasStateAuthority)
-                rb.simulated = false;
+                rb.bodyType = RigidbodyType2D.Kinematic;
 
             if (HasStateAuthority)
                 idleDespawnTimer = TickTimer.CreateFromSeconds(Runner, IdleLifetimeSeconds);
+        }
+
+        // Fired on every client (not just the new/old authority) when authority for this object
+        // changes — e.g. after a successful Object.RequestStateAuthority() from Pick(). Needed
+        // because Spawned() only runs once, but authority (and therefore who should be simulating
+        // this Rigidbody2D as Dynamic vs Kinematic-proxy) can move between clients afterwards.
+        public void StateAuthorityChanged()
+        {
+            if (rb == null)
+                return;
+
+            rb.bodyType = HasStateAuthority && !IsPicked
+                ? RigidbodyType2D.Dynamic
+                : RigidbodyType2D.Kinematic;
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)

@@ -25,9 +25,12 @@ namespace Koitan
             TryGetComponent(out rb);
 
             // See OnlineBomb.Spawned(): NetworkTransform doesn't disable local physics on proxies,
-            // so non-authority clients must not run their own simulation of this Rigidbody2D.
+            // so non-authority clients must not run their own Dynamic simulation of this Rigidbody2D.
+            // Kinematic (not simulated=false) is used so the object still generates the
+            // OnCollisionEnter2D pickup event on every client — simulated=false switches physics off
+            // entirely, which would silently break pickup for any player who isn't the state authority.
             if (!HasStateAuthority && rb != null)
-                rb.simulated = false;
+                rb.bodyType = RigidbodyType2D.Kinematic;
 
             if (HasStateAuthority)
                 IsGrowing = true;
