@@ -1,8 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using Fusion;
 
 namespace Koitan
 {
@@ -14,12 +17,18 @@ namespace Koitan
         TextMeshProUGUI[] rankTexts;
         [SerializeField]
         GameObject[] moneyUis;
+        [SerializeField]
+        Button retryButton;
+        const string OnlineBattleScenePath = "Assets/Scenes/Zakky/OnlineBattleScene.unity";
         int moneyMax = 0;
         List<int[]> sortRank = new List<int[]>();
         // Start is called before the first frame update
         void Start()
         {
-            //UI‚Ì•\Ž¦
+            if (retryButton != null)
+                retryButton.onClick.AddListener(OnRetryClicked);
+
+            //UIï¿½Ì•\ï¿½ï¿½
             for (int i = 0; i < BattleGlobal.MaxPlayerNum; i++)
             {
                 if (i < Result.playerCount)
@@ -35,7 +44,7 @@ namespace Koitan
                     moneyUis[i].SetActive(false);
                 }
             }
-            // ƒ\[ƒg
+            // ï¿½\ï¿½[ï¿½g
             sortRank.Sort((a, b) => b[1] - a[1]);
             for (int i = 0; i < Result.playerCount; i++)
             {
@@ -43,8 +52,8 @@ namespace Koitan
                 rankTexts[sortRank[i][0]].transform.localScale = Vector3.zero;
                 rankTexts[sortRank[i][0]].transform.DOScale(3f - i * 0.75f, 1).SetDelay(i * 0.25f + 2);
             }
-            // Œ‹‰Ê‚ÌÀ•W‚ðŒvŽZ‚·‚é
-            // ‡ˆÊ‚ª1ˆÊ‚Ìl‚ªŠî€
+            // ï¿½ï¿½ï¿½Ê‚Ìï¿½ï¿½Wï¿½ï¿½ï¿½vï¿½Zï¿½ï¿½ï¿½ï¿½
+            // ï¿½ï¿½ï¿½Ê‚ï¿½1ï¿½Ê‚Ìlï¿½ï¿½ï¿½î€
             for (int i = 0; i < Result.playerCount; i++)
             {
                 moneyUis[i].transform.DOLocalMoveY((float)Result.playerMoneys[i] / moneyMax * 500f, 2f).SetRelative();
@@ -55,6 +64,27 @@ namespace Koitan
         void Update()
         {
 
+        }
+
+        void OnRetryClicked()
+        {
+            NetworkRunner runner = FindAnyObjectByType<NetworkRunner>();
+
+            if (runner != null && runner.IsRunning)
+            {
+                // Only the scene authority is allowed to move the room to a new scene; a
+                // non-authority client's click is a harmless no-op here (the room's actual
+                // authority still has to be the one to press Retry).
+                if (runner.IsSceneAuthority)
+                {
+                    int buildIndex = SceneUtility.GetBuildIndexByScenePath(OnlineBattleScenePath);
+                    runner.LoadScene(SceneRef.FromIndex(buildIndex), LoadSceneMode.Single);
+                }
+            }
+            else
+            {
+                BattleManager.StartBattle();
+            }
         }
     }
 }

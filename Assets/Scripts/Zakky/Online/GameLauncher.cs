@@ -2,6 +2,7 @@ using Fusion;
 using Fusion.Sockets;
 using Koitan;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -18,33 +19,55 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
 
     private async void Start()
     {
-        runner = Instantiate(networkRunnerPrefab);
-        DontDestroyOnLoad(runner.gameObject);
+        // Retry (see ResultManager.OnRetryClicked()) calls runner.LoadScene() on the still-running
+        // runner from before, which reloads this scene and recreates this GameLauncher from
+        // scratch — reuse the existing runner instead of instantiating and starting a second one
+        // alongside it, which would try to open a second simultaneous Photon connection.
+        NetworkRunner existingRunner = FindAnyObjectByType<NetworkRunner>();
 
-        runner.ProvideInput = true;
-        runner.AddCallbacks(this);
-
-        var sceneManager = runner.GetComponent<NetworkSceneManagerDefault>();
-        if (sceneManager == null)
-            sceneManager = runner.gameObject.AddComponent<NetworkSceneManagerDefault>();
-
-        var result = await runner.StartGame(new StartGameArgs
+        if (existingRunner != null && existingRunner.IsRunning)
         {
-            GameMode = GameMode.Shared,
-            SceneManager = sceneManager,
-            PlayerCount = BattleGlobal.MaxPlayerNum
-        });
+            runner = existingRunner;
+        }
+        else
+        {
+            runner = Instantiate(networkRunnerPrefab);
+            DontDestroyOnLoad(runner.gameObject);
 
-        Debug.Log($"[GameLauncher] StartGame result={result.Ok}, reason={result.ShutdownReason}");
+            runner.ProvideInput = true;
 
-        if (!result.Ok)
-            return;
+            var sceneManager = runner.GetComponent<NetworkSceneManagerDefault>();
+            if (sceneManager == null)
+                sceneManager = runner.gameObject.AddComponent<NetworkSceneManagerDefault>();
+
+            var result = await runner.StartGame(new StartGameArgs
+            {
+                GameMode = GameMode.Shared,
+                SceneManager = sceneManager,
+                PlayerCount = BattleGlobal.MaxPlayerNum
+            });
+
+            Debug.Log($"[GameLauncher] StartGame result={result.Ok}, reason={result.ShutdownReason}");
+
+            if (!result.Ok)
+                return;
+        }
+
+        // The pre-reload GameLauncher (if any) was just destroyed along with the rest of the old
+        // scene, so this instance needs to register itself as the one Fusion routes callbacks to.
+        runner.AddCallbacks(this);
 
         if (runner.IsSceneAuthority)
         {
             Debug.Log($"[GameLauncher] LoadScene index={onlineBattleSceneBuildIndex}");
             runner.LoadScene(SceneRef.FromIndex(onlineBattleSceneBuildIndex), LoadSceneMode.Single);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (runner != null)
+            runner.RemoveCallbacks(this);
     }
 
     void INetworkRunnerCallbacks.OnSceneLoadDone(NetworkRunner runner)
@@ -82,6 +105,37 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
 
         if (playerSpawned)
             return;
+
+        StartCoroutine(SpawnWhenRoomReady(avatarIndex));
+    }
+
+    // Joining a room whose match already finished for its other players (see
+    // BattleManager.HasAnyPlayerFinishedMatch()) must not spawn an avatar straight away: that
+    // match's own end-of-round flow left the scene locally on every other client via a plain,
+    // non-Fusion SceneManager.LoadScene("Result"), so this room's simulation is effectively
+    // abandoned from their side even though Fusion itself has no idea. Wait instead, so the
+    // joining client doesn't spawn into a scene nobody else is actually watching anymore.
+    private IEnumerator SpawnWhenRoomReady(int avatarIndex)
+    {
+        // Give newly-replicated avatars (and their HasFinishedMatch state) a moment to arrive
+        // before the first check, rather than trusting whatever's visible on the very first frame.
+        yield return new WaitForSeconds(0.3f);
+
+        bool waited = false;
+
+        while (BattleManager.HasAnyPlayerFinishedMatch())
+        {
+            waited = true;
+            BattleManager.WaitingForMatchEnd = true;
+            BattleManager.instance.ShowWaitingForMatchEndMessage();
+            yield return null;
+        }
+
+        if (waited)
+            BattleManager.WaitingForMatchEnd = false;
+
+        if (playerSpawned)
+            yield break;
 
         playerSpawned = true;
 

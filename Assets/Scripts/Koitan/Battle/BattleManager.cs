@@ -229,8 +229,43 @@ namespace Koitan
 
         }
 
+        // Set by GameLauncher while it's deliberately holding off spawning the local avatar
+        // (room already finished its match — see HasFinishedMatch) so it can own readyStatusText
+        // itself without UpdateReadyStatus() fighting it for the same label every frame.
+        public static bool WaitingForMatchEnd;
+
+        // A newly-joining client's own BattleManager always starts fresh at BeforeBattle, so it
+        // can't tell from its own state whether the room it just connected to already played out
+        // a match — it has to ask the avatars that replicated in from other, longer-connected
+        // clients instead.
+        public static bool HasAnyPlayerFinishedMatch()
+        {
+            if (instance == null)
+                return false;
+
+            for (int i = 0; i < instance.onlinePlayers.Count; i++)
+            {
+                if (instance.onlinePlayers[i].HasFinishedMatch)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void ShowWaitingForMatchEndMessage()
+        {
+            if (readyStatusText == null)
+                return;
+
+            readyStatusText.gameObject.SetActive(true);
+            readyStatusText.text = "他のプレイヤーの対戦が終わるのを待っています...";
+        }
+
         void UpdateReadyStatus()
         {
+            if (WaitingForMatchEnd)
+                return;
+
             int readyCount = 0;
             for (int i = 0; i < onlinePlayers.Count; i++)
             {
@@ -298,6 +333,17 @@ namespace Koitan
         {
             owariText.SetActive(true);
             battleProgress = BattleProgress.AfterBattle;
+
+            // Flag this client's own avatar so a client that joins the room after this point (see
+            // HasAnyPlayerFinishedMatch()) knows the match already ended here, instead of spawning
+            // into a scene everyone else has already locally left for Result.
+            if (isOnlineBattle)
+            {
+                PlayerAvatar localAvatar = onlinePlayers.Find(a => a.HasInputAuthority);
+                if (localAvatar != null)
+                    localAvatar.HasFinishedMatch = true;
+            }
+
             yield return new WaitForSeconds(2f);
             // ���U���g�ɏ���n��
             if (isOnlineBattle)

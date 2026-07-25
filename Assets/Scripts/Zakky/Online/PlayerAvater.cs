@@ -10,6 +10,12 @@ namespace Koitan
         [Networked] public int TeamIndex { get; set; } = -1;
         [Networked] public int Money { get; set; }
         [Networked] public NetworkBool IsReady { get; set; }
+        // Set on this avatar by its own owning client when its local match ends (see
+        // BattleManager.OwatiAnim()). BattleManager.OwatiAnim() leaves the scene via a plain,
+        // non-Fusion SceneManager.LoadScene("Result") rather than a networked scene change, so this
+        // is the only signal a newly-joining client has that the room it's connecting to already
+        // wrapped up its match — used to make it wait instead of spawning into a stale room.
+        [Networked] public NetworkBool HasFinishedMatch { get; set; }
         [Networked] private NetworkBool FacingRight { get; set; } = true;
 
         private Animator animator;
