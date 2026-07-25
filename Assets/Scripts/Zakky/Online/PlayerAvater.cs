@@ -256,14 +256,18 @@ namespace Koitan
             }
         }
 
-        private void OnCollisionEnter2D(Collision2D collision)
+        private void OnTriggerEnter2D(Collider2D collision)
         {
             if (!HasStateAuthority)
                 return;
 
-            if (collision.collider.CompareTag("Money"))
+            // Money uses a trigger (not solid OnCollisionEnter2D) because this avatar's own
+            // Rigidbody2D is always Kinematic (PC2D's motor) and, on any client that isn't the
+            // money's state authority, so is the money's — Unity 2D physics never raises collision
+            // callbacks for a Kinematic-vs-Kinematic pair, only for trigger overlaps.
+            if (collision.CompareTag("Money"))
             {
-                OnlineMoney money = collision.collider.GetComponentInParent<OnlineMoney>();
+                OnlineMoney money = collision.GetComponentInParent<OnlineMoney>();
 
                 if (money != null)
                 {
