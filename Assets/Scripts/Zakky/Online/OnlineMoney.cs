@@ -29,7 +29,12 @@ namespace Koitan
             // Kinematic (not simulated=false) is used so the object still generates the
             // OnCollisionEnter2D pickup event on every client — simulated=false switches physics off
             // entirely, which would silently break pickup for any player who isn't the state authority.
-            if (!HasStateAuthority && rb != null)
+            //
+            // The state authority also needs Kinematic here — same as offline Money's
+            // isKinematic = true while it's growing on the shop (see ShopController.CreateMoney()) —
+            // otherwise the prefab's default Dynamic body just falls under gravity the instant it
+            // spawns, since nothing else is anchoring it in place.
+            if (rb != null)
                 rb.bodyType = RigidbodyType2D.Kinematic;
 
             if (HasStateAuthority)
@@ -66,6 +71,11 @@ namespace Koitan
 
             TeamColorIndex = -1;
             IsGrowing = false;
+
+            // Mirrors offline Money's isKinematic = false on BrokenShop(): once released it's a
+            // free, fallable pickup on the ground rather than anchored in place on the shop.
+            if (rb != null)
+                rb.bodyType = RigidbodyType2D.Dynamic;
         }
 
         public bool IsGetable(int pickerTeamIndex)
