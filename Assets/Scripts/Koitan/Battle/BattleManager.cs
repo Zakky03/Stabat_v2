@@ -354,6 +354,15 @@ namespace Koitan
                     PlayerAvatar avatar = onlinePlayers[i];
                     Result.playerMoneys[avatar.PlayerIndex] = avatar.Money;
                 }
+
+                // Properly remove this client's own avatar from the Fusion session before leaving,
+                // instead of letting the upcoming scene unload silently destroy it outside Fusion's
+                // bookkeeping. Without this, other clients (including a new joiner checking
+                // HasAnyPlayerFinishedMatch()) would keep a stale copy that never actually goes
+                // away, so the "waiting for match to end" gate would never clear.
+                PlayerAvatar localAvatar = onlinePlayers.Find(a => a.HasInputAuthority);
+                if (localAvatar != null && runner != null)
+                    runner.Despawn(localAvatar.Object);
             }
             else
             {
