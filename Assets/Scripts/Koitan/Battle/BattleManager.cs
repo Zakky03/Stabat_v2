@@ -59,10 +59,10 @@ namespace Koitan
         [SerializeField]
         GameObject hagimariText;
         [SerializeField]
+        TextMeshProUGUI readyStatusText;
+        [SerializeField]
         bool isOnlineBattle;
         NetworkRunner runner;
-        TextMeshProUGUI hagimariTMP;
-        string hagimariOriginalText;
         bool hagimariStarted;
         BattleProgress battleProgress = BattleProgress.BeforeBattle;
         public static ShopController[] Shops => instance.shops;
@@ -135,12 +135,13 @@ namespace Koitan
                 }
             }
 
+            // Online: hagimariText is the "3, 2, 1, Go!" countdown banner played once everyone is
+            // ready (see HagimariAnim()) — it must stay hidden during the waiting phase itself,
+            // which uses the separate readyStatusText instead.
             if (isOnlineBattle)
             {
-                hagimariTMP = hagimariText.GetComponentInChildren<TextMeshProUGUI>(true);
-                if (hagimariTMP != null)
-                    hagimariOriginalText = hagimariTMP.text;
-                hagimariText.SetActive(true);
+                if (readyStatusText != null)
+                    readyStatusText.gameObject.SetActive(true);
             }
             else
             {
@@ -215,14 +216,16 @@ namespace Koitan
                     readyCount++;
             }
 
-            if (hagimariTMP != null)
-                hagimariTMP.text = $"Ready {readyCount}/{onlinePlayers.Count}\n(Press Start)";
+            int waitingCount = onlinePlayers.Count - readyCount;
+
+            if (readyStatusText != null)
+                readyStatusText.text = $"準備中: {waitingCount}人 ({readyCount}/{onlinePlayers.Count})\n(Press Start)";
 
             if (onlinePlayers.Count > 0 && readyCount == onlinePlayers.Count)
             {
                 hagimariStarted = true;
-                if (hagimariTMP != null)
-                    hagimariTMP.text = hagimariOriginalText;
+                if (readyStatusText != null)
+                    readyStatusText.gameObject.SetActive(false);
                 StartCoroutine(HagimariAnim());
             }
         }
