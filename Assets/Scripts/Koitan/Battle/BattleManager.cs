@@ -118,7 +118,6 @@ namespace Koitan
 
         private void Start()
         {
-            // Online: each PlayerAvatar toggles its own moneyUis slot on Spawned/Despawned instead.
             if (!isOnlineBattle)
             {
                 for (int i = 0; i < BattleGlobal.MaxPlayerNum; i++)
@@ -132,6 +131,16 @@ namespace Koitan
                     {
                         moneyUis[i].SetActive(false);
                     }
+                }
+            }
+            else
+            {
+                // Each PlayerAvatar toggles its own slot on via SetMoneyUIActive when it spawns (and
+                // off again on Despawned) — but the scene's moneyUis GameObjects default to active,
+                // so without this, slots for players who never join stay visibly on forever.
+                for (int i = 0; i < BattleGlobal.MaxPlayerNum; i++)
+                {
+                    moneyUis[i].SetActive(false);
                 }
             }
 
@@ -187,7 +196,11 @@ namespace Koitan
                 for (int i = 0; i < onlinePlayers.Count; i++)
                 {
                     PlayerAvatar avatar = onlinePlayers[i];
-                    moneyTexts[avatar.PlayerIndex].text = $"{avatar.Money}G";
+                    TextMeshProUGUI text = moneyTexts[avatar.PlayerIndex];
+                    // Keep the string short (auto-sizing only has so much room to shrink into) —
+                    // mark "yours" with color instead of appending text like "(YOU)".
+                    text.text = $"P{avatar.PlayerIndex + 1}: {avatar.Money}G";
+                    text.color = avatar.HasInputAuthority ? Color.yellow : Color.white;
                 }
             }
             else
@@ -198,11 +211,18 @@ namespace Koitan
                 }
             }
             KoitanDebug.Display($"MoneyInstances.Count = {moneyInstances.Count}");
-            itemCreateTime += Time.deltaTime;
-            if (itemCreateTime > intervalTime)
+
+            // Items (bombs) must only spawn once the battle has actually started — not during the
+            // online ready/waiting lobby, which (unlike offline's fixed ~4s intro) can last however
+            // long it takes everyone to press Ready.
+            if (battleProgress == BattleProgress.Battle)
             {
-                itemCreateTime = 0;
-                CreateItem();
+                itemCreateTime += Time.deltaTime;
+                if (itemCreateTime > intervalTime)
+                {
+                    itemCreateTime = 0;
+                    CreateItem();
+                }
             }
 
         }
