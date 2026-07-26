@@ -17,7 +17,13 @@ namespace Koitan
         // wrapped up its match — used to make it wait instead of spawning into a stale room.
         [Networked] public NetworkBool HasFinishedMatch { get; set; }
         [Networked] public NetworkString<_32> Username { get; set; }
+        // Local (per-device) rating, not a shared/server leaderboard — see
+        // BattleManager.OwatiAnim() for how it's updated at match end.
+        [Networked] public int Rating { get; set; }
         [Networked] private NetworkBool FacingRight { get; set; } = true;
+
+        public const string RatingPrefsKey = "OnlineRating";
+        public const int DefaultRating = 1500;
 
         private Animator animator;
         private PlatformerMotor2D motor;
@@ -53,6 +59,9 @@ namespace Koitan
             // moneyUis visibility is recomputed every frame from BattleManager.OnlinePlayers
             // (see BattleManager.Update()), so adding to that list is all that's needed here.
             BattleManager.OnlinePlayers.Add(this);
+
+            if (HasStateAuthority)
+                Rating = PlayerPrefs.GetInt(RatingPrefsKey, DefaultRating);
 
             // Same weight/radius as the offline camera setup — offline players are pre-placed scene
             // objects, but online avatars are spawned dynamically by Fusion, so they must register

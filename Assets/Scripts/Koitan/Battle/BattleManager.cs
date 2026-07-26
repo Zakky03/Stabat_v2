@@ -370,6 +370,11 @@ namespace Koitan
 
             yield return new WaitForSeconds(2f);
             // ���U���g�ɏ���n��
+            // Result's fields are static and persist across scene loads within the same running
+            // app, so a stale hasRatings=true from a previous online match must not leak into an
+            // offline match's Result screen (or vice versa).
+            Result.hasRatings = false;
+
             if (isOnlineBattle)
             {
                 Result.playerCount = onlinePlayers.Count;
@@ -378,6 +383,8 @@ namespace Koitan
                     PlayerAvatar avatar = onlinePlayers[i];
                     Result.playerMoneys[avatar.PlayerIndex] = avatar.Money;
                 }
+
+                UpdateRatings();
 
                 // Properly remove this client's own avatar from the Fusion session before leaving,
                 // instead of letting the upcoming scene unload silently destroy it outside Fusion's
@@ -397,6 +404,68 @@ namespace Koitan
                 }
             }
             SceneManager.LoadScene("Result");
+        }
+
+        // Local (per-device) ELO-style rating based on final money ranking — not a shared/server
+        // leaderboard. Every client computes the same result for every player (deterministic given
+        // the synced pre-match ratings and money-based ranks), so the Result screen can show
+        // everyone's change, but only the local player's own client persists its own new value.
+        void UpdateRatings()
+        {
+            int n = onlinePlayers.Count;
+            if (n == 0)
+                return;
+
+            Result.hasRatings = true;
+
+            if (n == 1)
+            {
+                // No opponents to compare against (e.g. solo testing) — rating just carries over
+                // unchanged, but still shown, rather than silently showing nothing at all.
+                PlayerAvatar solo = onlinePlayers[0];
+                Result.playerRatingsBefore[solo.PlayerIndex] = solo.Rating;
+                Result.playerRatingsAfter[solo.PlayerIndex] = solo.Rating;
+
+                if (solo.HasInputAuthority)
+                {
+                    PlayerPrefs.SetInt(PlayerAvatar.RatingPrefsKey, solo.Rating);
+                    PlayerPrefs.Save();
+                }
+
+                return;
+            }
+
+            List<PlayerAvatar> byRank = new List<PlayerAvatar>(onlinePlayers);
+            byRank.Sort((a, b) => b.Money.CompareTo(a.Money));
+
+            const float K = 32f;
+
+            for (int rank = 0; rank < n; rank++)
+            {
+                PlayerAvatar avatar = byRank[rank];
+
+                float avgOpponentRating = 0f;
+                for (int j = 0; j < n; j++)
+                {
+                    if (byRank[j] != avatar)
+                        avgOpponentRating += byRank[j].Rating;
+                }
+                avgOpponentRating /= (n - 1);
+
+                float expected = 1f / (1f + Mathf.Pow(10f, (avgOpponentRating - avatar.Rating) / 400f));
+                float actual = (n - 1 - rank) / (float)(n - 1); // 1st place = 1, last place = 0
+
+                int newRating = Mathf.RoundToInt(avatar.Rating + K * (actual - expected));
+
+                Result.playerRatingsBefore[avatar.PlayerIndex] = avatar.Rating;
+                Result.playerRatingsAfter[avatar.PlayerIndex] = newRating;
+
+                if (avatar.HasInputAuthority)
+                {
+                    PlayerPrefs.SetInt(PlayerAvatar.RatingPrefsKey, newRating);
+                    PlayerPrefs.Save();
+                }
+            }
         }
 
         /// <summary>

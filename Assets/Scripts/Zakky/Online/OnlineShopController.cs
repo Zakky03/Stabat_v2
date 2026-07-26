@@ -57,13 +57,20 @@ namespace Koitan
             if (currentMoney != null && currentMoney.IsValid)
                 return;
 
-            if (moneyTimer.ExpiredOrNotRunning(Runner))
+            // The cooldown must start counting from when the money actually disappeared (picked
+            // up), not from when it was originally spawned — it previously reset the timer right
+            // after spawning, so by the time money had grown enough to be worth picking up, the
+            // timer had usually already expired and the next one appeared instantly.
+            if (!moneyTimer.IsRunning)
+                moneyTimer = TickTimer.CreateFromSeconds(Runner, MoneyIntervalSeconds);
+
+            if (moneyTimer.Expired(Runner))
             {
                 NetworkObject spawned = Runner.Spawn(moneyPrefab, moneyInitTf.position, Quaternion.identity);
                 OnlineMoney money = spawned.GetComponent<OnlineMoney>();
                 money.TeamColorIndex = TeamIndex;
                 currentMoney = spawned;
-                moneyTimer = TickTimer.CreateFromSeconds(Runner, MoneyIntervalSeconds);
+                moneyTimer = TickTimer.None;
             }
         }
 

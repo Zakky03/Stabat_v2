@@ -35,7 +35,18 @@ namespace Koitan
                 {
                     moneyUis[i].SetActive(true);
                     moneyUis[i].transform.localPosition = new Vector3(1920 / Result.playerCount * (i + 0.5f) - 960, -420);
-                    moneyTexts[i].text = $"{Result.playerMoneys[i]}G";
+
+                    if (Result.hasRatings)
+                    {
+                        int delta = Result.playerRatingsAfter[i] - Result.playerRatingsBefore[i];
+                        string sign = delta >= 0 ? "+" : "";
+                        moneyTexts[i].text = $"{Result.playerMoneys[i]}G\n{Result.playerRatingsAfter[i]} ({sign}{delta})";
+                    }
+                    else
+                    {
+                        moneyTexts[i].text = $"{Result.playerMoneys[i]}G";
+                    }
+
                     moneyMax = Mathf.Max(moneyMax, Result.playerMoneys[i]);
                     sortRank.Add(new int[] { i, Result.playerMoneys[i] });
                 }
