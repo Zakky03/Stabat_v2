@@ -61,6 +61,8 @@ namespace Koitan
         [SerializeField]
         TextMeshProUGUI readyStatusText;
         [SerializeField]
+        TMP_InputField usernameInputField;
+        [SerializeField]
         bool isOnlineBattle;
         NetworkRunner runner;
         bool hagimariStarted;
@@ -147,11 +149,27 @@ namespace Koitan
             {
                 if (readyStatusText != null)
                     readyStatusText.gameObject.SetActive(true);
+
+                if (usernameInputField != null)
+                {
+                    usernameInputField.gameObject.SetActive(true);
+                    usernameInputField.onEndEdit.AddListener(OnUsernameEndEdit);
+                }
             }
             else
             {
                 StartCoroutine(HagimariAnim());
             }
+        }
+
+        // Only ever applies to this client's own avatar — every other client's copy of that
+        // avatar already gets the name via normal Networked-property replication.
+        void OnUsernameEndEdit(string value)
+        {
+            PlayerAvatar localAvatar = onlinePlayers.Find(a => a.HasInputAuthority);
+
+            if (localAvatar != null)
+                localAvatar.SetUsername(value);
         }
 
         private void OnDestroy()
@@ -199,7 +217,8 @@ namespace Koitan
                     TextMeshProUGUI text = moneyTexts[avatar.PlayerIndex];
                     // Keep the string short (auto-sizing only has so much room to shrink into) —
                     // mark "yours" with color instead of appending text like "(YOU)".
-                    text.text = $"P{avatar.PlayerIndex + 1}: {avatar.Money}G";
+                    string label = avatar.Username.Length > 0 ? avatar.Username.Value : $"P{avatar.PlayerIndex + 1}";
+                    text.text = $"{label}: {avatar.Money}G";
                     text.color = avatar.HasInputAuthority ? Color.yellow : Color.white;
                 }
 
@@ -286,6 +305,8 @@ namespace Koitan
                 hagimariStarted = true;
                 if (readyStatusText != null)
                     readyStatusText.gameObject.SetActive(false);
+                if (usernameInputField != null)
+                    usernameInputField.gameObject.SetActive(false);
                 StartCoroutine(HagimariAnim());
             }
         }

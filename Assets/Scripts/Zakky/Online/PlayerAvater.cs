@@ -16,6 +16,7 @@ namespace Koitan
         // is the only signal a newly-joining client has that the room it's connecting to already
         // wrapped up its match — used to make it wait instead of spawning into a stale room.
         [Networked] public NetworkBool HasFinishedMatch { get; set; }
+        [Networked] public NetworkString<_32> Username { get; set; }
         [Networked] private NetworkBool FacingRight { get; set; } = true;
 
         private Animator animator;
@@ -216,6 +217,17 @@ namespace Koitan
 
             if (charaColorChanger != null)
                 charaColorChanger.ChangeColor(playerIndex, teamIndex);
+        }
+
+        // Only ever called on this avatar's own owning client (e.g. from the username input field
+        // during the ready/waiting phase), which is also this avatar's state authority in Shared
+        // mode, so setting the networked value directly is safe here.
+        public void SetUsername(string name)
+        {
+            if (!HasStateAuthority)
+                return;
+
+            Username = name;
         }
 
         public void AddPowerVec(Vector2 vec)
