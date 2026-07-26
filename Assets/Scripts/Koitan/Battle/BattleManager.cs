@@ -65,6 +65,9 @@ namespace Koitan
         NetworkRunner runner;
         bool hagimariStarted;
         BattleProgress battleProgress = BattleProgress.BeforeBattle;
+        // Lets PlayerAvatar block movement/actions on its own avatar until the battle has actually
+        // started, without needing the private BattleProgress enum exposed outside this class.
+        public static bool IsBattleStarted => instance != null && instance.battleProgress == BattleProgress.Battle;
         public static ShopController[] Shops => instance.shops;
         public static List<Money> moneyInstances = new List<Money>();
         // Start is called before the first frame update

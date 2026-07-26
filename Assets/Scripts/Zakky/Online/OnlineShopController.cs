@@ -6,6 +6,8 @@ namespace Koitan
     public class OnlineShopController : NetworkBehaviour
     {
         const float MoneyIntervalSeconds = 2f;
+        // Matches offline ShopController's landCreateIntervalTime.
+        const float LandRestoreSeconds = 2f;
 
         [SerializeField] private Transform landParent;
         [SerializeField] private Transform shopParent;
@@ -18,6 +20,7 @@ namespace Koitan
         [Networked] public int TeamIndex { get; private set; }
         [Networked] private TickTimer moneyTimer { get; set; }
         [Networked] private NetworkObject currentMoney { get; set; }
+        [Networked] private TickTimer landRestoreTimer { get; set; }
 
         private bool appliedIsBuild;
         private bool appliedIsBroken;
@@ -33,7 +36,22 @@ namespace Koitan
             if (!HasStateAuthority)
                 return;
 
-            if (!IsBuild || IsBroken)
+            // Mirrors offline ShopController.Update()'s isBroken -> CreateLand() timer: a broken
+            // shop's plot goes back to buildable "land" after a short delay, instead of staying an
+            // empty, un-rebuildable gap forever (there was previously nothing here to ever clear
+            // IsBroken back to false again).
+            if (IsBroken)
+            {
+                if (landRestoreTimer.Expired(Runner))
+                {
+                    IsBroken = false;
+                    landRestoreTimer = TickTimer.None;
+                }
+
+                return;
+            }
+
+            if (!IsBuild)
                 return;
 
             if (currentMoney != null && currentMoney.IsValid)
@@ -113,6 +131,7 @@ namespace Koitan
         {
             IsBuild = false;
             IsBroken = true;
+            landRestoreTimer = TickTimer.CreateFromSeconds(Runner, LandRestoreSeconds);
 
             if (currentMoney != null && currentMoney.IsValid)
             {

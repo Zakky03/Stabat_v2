@@ -88,6 +88,17 @@ namespace Koitan
                 IsReady = true;
             }
 
+            // Before the battle actually starts (still waiting on Ready / playing the "3, 2, 1,
+            // Go!" intro), players shouldn't be able to move or act at all — only pressing Ready
+            // should do anything during this phase.
+            if (!BattleManager.IsBattleStarted)
+            {
+                motor.normalizedXMovement = 0f;
+                motor.normalizedYMovement = 0f;
+                previousButtons = input.Buttons;
+                return;
+            }
+
             float deltaTime = Runner.DeltaTime;
 
             animator.SetBool("Fall", motor.IsFalling());
