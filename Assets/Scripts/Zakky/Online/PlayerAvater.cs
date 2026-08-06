@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Koitan
 {
-    public class PlayerAvatar : NetworkBehaviour
+    public class PlayerAvatar : NetworkBehaviour, IBattlePlayer
     {
         [Networked] public int PlayerIndex { get; set; }
         [Networked] public int TeamIndex { get; set; } = -1;
@@ -32,6 +32,9 @@ namespace Koitan
         [SerializeField] private CharaLibrarySets librarySets;
         [SerializeField] private Transform handTf;
         public Transform HandTf => handTf;
+
+        // FesGame18 から移植した攻撃システム。未設定なら攻撃なしのキャラとして動く。
+        [SerializeField] private PlayerAttack playerAttack;
 
         private OnlineShopController nearShop = null;
         private OnlineBomb nearBomb = null;
@@ -111,6 +114,14 @@ namespace Koitan
 
             float deltaTime = Runner.DeltaTime;
 
+            // 攻撃の進行。硬直中も進める必要があるので操作不能の判定より前で回す。
+            // ここは HasStateAuthority のクライアントでしか回らないため、他プレイヤーの画面では
+            // 攻撃モーションが進まない点に注意（当たり判定自体は攻撃側が持つので判定はズレない）。
+            if (playerAttack != null)
+            {
+                playerAttack.Tick(deltaTime);
+            }
+
             animator.SetBool("Fall", motor.IsFalling());
             animator.SetBool("Ground", motor.IsGrounded());
             animator.SetBool("Damage", IsInoperable() && IsInvincible());
@@ -181,7 +192,32 @@ namespace Koitan
                 }
             }
 
+            // 攻撃（X=近接、Y=飛び道具）。オフラインの PlayerController と同じ割り当て。
+            if (playerAttack != null)
+            {
+                if (input.Buttons.WasPressed(previousButtons, PlayerButtons.Attack1))
+                {
+                    StartAttack(0);
+                }
+                else if (input.Buttons.WasPressed(previousButtons, PlayerButtons.Attack2))
+                {
+                    StartAttack(1);
+                }
+            }
+
             previousButtons = input.Buttons;
+        }
+
+        /// <summary>
+        /// 攻撃を開始する。攻撃中は動けないよう、全体時間ぶんの硬直を入れる
+        /// （硬直の解除は FixedUpdateNetwork の操作不能処理に任せる）。
+        /// </summary>
+        private void StartAttack(int index)
+        {
+            if (playerAttack.TryAttack(index))
+            {
+                SetInoperableTime(playerAttack.GetTotalTime(index));
+            }
         }
 
         public void SetInoperableTime(float time)
@@ -253,8 +289,37 @@ namespace Koitan
             SetInoperableTime(time);
             SetInvincibleTime(time * 2f);
 
+            // 殴られたら攻撃は中断する（判定が出しっぱなしになるのを防ぐ）
+            if (playerAttack != null)
+                playerAttack.Cancel();
+
             if (animator != null)
                 animator.Play("Damage");
+        }
+
+        // IBattlePlayer の実装。PlayerIndex / TeamIndex は上の [Networked] プロパティがそのまま満たす。
+        /// <summary>
+        /// 向き。オンラインでは localScale ではなく [Networked] の FacingRight が正。
+        /// （localScale は Render() で FacingRight から反映しているだけなので、
+        /// FixedUpdateNetwork のタイミングでは1フレーム古い可能性がある）
+        /// </summary>
+        public int FacingSign => FacingRight ? 1 : -1;
+
+        public Transform Transform => transform;
+
+        /// <summary>
+        /// ヒット判定は攻撃側の StateAuthority を持つクライアントだけが行う。
+        /// こうしないと全クライアントで同じ攻撃が多重に判定されてしまう。
+        /// </summary>
+        public bool HasAttackAuthority => HasStateAuthority;
+
+        /// <summary>
+        /// 攻撃側のクライアントから呼ばれる。自分が殴られる側なので、
+        /// 実際の適用は自分の StateAuthority 宛の RPC に委譲する。
+        /// </summary>
+        public void ApplyDamage(Vector2 knockback, float inoperableTime)
+        {
+            RPC_ApplyDamage(knockback, inoperableTime);
         }
 
         private void OnTriggerStay2D(Collider2D collision)

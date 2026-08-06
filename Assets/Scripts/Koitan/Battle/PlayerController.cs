@@ -8,7 +8,7 @@ using Cinemachine;
 
 namespace Koitan
 {
-    public class PlayerController : MonoBehaviour
+    public class PlayerController : MonoBehaviour, IBattlePlayer
     {
         public int playerIndex;
         public int teamIndex = -1;
@@ -17,6 +17,12 @@ namespace Koitan
         //[SerializeField]
         //GameObject mesh;
         CharaColorChanger charaColorChanger;
+        /// <summary>
+        /// 攻撃の進行管理。FesGame18から移植した攻撃システム。
+        /// 未設定なら攻撃なしのキャラとして動く。
+        /// </summary>
+        [SerializeField]
+        PlayerAttack playerAttack;
         [SerializeField]
         CharaLibrarySets librarySets;
         ShopController nearShop = null;
@@ -63,6 +69,12 @@ namespace Koitan
             }
 
             //操作不能
+            //攻撃の進行。硬直中も進める必要があるので操作不能の判定より前で回す
+            if (playerAttack != null)
+            {
+                playerAttack.Tick(Time.deltaTime);
+            }
+
             if (inoperableTime > 0f)
             {
                 inoperableTime -= Time.deltaTime;
@@ -118,6 +130,32 @@ namespace Koitan
                     nearBomb = null;
                 }
             }
+
+            //攻撃(X=近接、Y=飛び道具)
+            //移植元はY=パイプ、B=光線銃だったが、こちらはBがジャンプなのでX/Yに割り当て直している
+            if (playerAttack != null)
+            {
+                if (KoitanInput.GetDown(ButtonCode.X, playerIndex))
+                {
+                    StartAttack(0);
+                }
+                else if (KoitanInput.GetDown(ButtonCode.Y, playerIndex))
+                {
+                    StartAttack(1);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 攻撃を開始する。攻撃中は動けないよう、全体時間ぶんの硬直を入れる
+        /// (硬直の解除はUpdateの操作不能処理に任せる)。
+        /// </summary>
+        void StartAttack(int index)
+        {
+            if (playerAttack.TryAttack(index))
+            {
+                SetInoperableTime(playerAttack.GetTotalTime(index));
+            }
         }
 
         /// <summary>
@@ -168,6 +206,22 @@ namespace Koitan
             charaColorChanger.ChangeColor(playerIndex, teamIndex);
         }
 
+        //IBattlePlayerの実装。HitBoxが「誰の攻撃か」「誰に当たったか」を判別するのに使う
+        public int PlayerIndex => playerIndex;
+        public int TeamIndex => teamIndex;
+        /// <summary>
+        /// 向き。このプロジェクトではlocalScale.xの符号で左右を表している(Update内で反転させている)。
+        /// </summary>
+        public int FacingSign => transform.localScale.x < 0f ? -1 : 1;
+        public Transform Transform => transform;
+        /// <summary>オフラインなので判定は常に自分で行う。</summary>
+        public bool HasAttackAuthority => true;
+
+        public void ApplyDamage(Vector2 knockback, float inoperableTime)
+        {
+            SetDamage(knockback, inoperableTime);
+        }
+
         public void AddPowerVec(Vector2 vec)
         {
             motor.velocity = vec;
@@ -179,6 +233,8 @@ namespace Koitan
             if (IsInvincible()) return;
             AddPowerVec(vec);
             SetInoperableTime(time);
+            //殴られたら攻撃は中断する(判定が出しっぱなしになるのを防ぐ)
+            if (playerAttack != null) playerAttack.Cancel();
             //とりあえず二倍の無敵時間
             SetInvincibleTime(time * 2f);
             //とりあえずアニメーション
