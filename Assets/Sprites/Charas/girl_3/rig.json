@@ -1,0 +1,319 @@
+{
+    "rootScale":  0.55,
+    "templateX":  0.065,
+    "templateY":  -0.237,
+    "bones":  [
+                  {
+                      "path":  "bone/hips",
+                      "px":  0.2502443,
+                      "py":  -0.6401962,
+                      "qz":  0.7384228,
+                      "qw":  0.674338,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low",
+                      "px":  0.5298879,
+                      "py":  0,
+                      "qz":  -0.0164169,
+                      "qw":  0.9998652,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high",
+                      "px":  0.3548294,
+                      "py":  0,
+                      "qz":  0.0803646,
+                      "qw":  0.9967656,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/neck",
+                      "px":  0.4365784,
+                      "py":  1E-07,
+                      "qz":  -0.0202849,
+                      "qw":  0.9997942,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/neck/head",
+                      "px":  0.2873276,
+                      "py":  0,
+                      "qz":  -0.0891729,
+                      "qw":  0.9960162,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/neck/head/bangs1-1",
+                      "px":  1.69628,
+                      "py":  -0.5547941,
+                      "qz":  -0.9466686,
+                      "qw":  0.3222092,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/neck/head/bangs1-1/bangs1-2",
+                      "px":  0.3307169,
+                      "py":  0,
+                      "qz":  -0.1497707,
+                      "qw":  0.9887208,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/neck/head/bangs1-1/bangs1-2/bangs1-3",
+                      "px":  0.3449329,
+                      "py":  2E-07,
+                      "qz":  -0.224491,
+                      "qw":  0.9744762,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/neck/head/bangs2-1",
+                      "px":  1.7800322,
+                      "py":  -0.226412,
+                      "qz":  -0.9740871,
+                      "qw":  0.2261734,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/neck/head/bangs2-1/bangs2-2",
+                      "px":  0.326626,
+                      "py":  -2E-07,
+                      "qz":  -0.3197241,
+                      "qw":  0.9475108,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/neck/head/bangs2-1/bangs2-2/bangs2-3",
+                      "px":  0.3230134,
+                      "py":  3E-07,
+                      "qz":  -0.2377926,
+                      "qw":  0.971316,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/neck/head/bangs3-1",
+                      "px":  1.6959268,
+                      "py":  0.2718178,
+                      "qz":  -0.967662,
+                      "qw":  -0.2522505,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/neck/head/bangs3-1/bangs3-2",
+                      "px":  0.3835347,
+                      "py":  7E-07,
+                      "qz":  0.0348966,
+                      "qw":  0.999391,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/neck/head/bangs3-1/bangs3-2/bangs3-3",
+                      "px":  0.4105005,
+                      "py":  -4E-07,
+                      "qz":  -0.2089996,
+                      "qw":  0.9779158,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/neck/head/hair1",
+                      "px":  2.0218644,
+                      "py":  0.1753949,
+                      "qz":  -1,
+                      "qw":  0,
+                      "scale":  1.0000024
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/neck/head/hair1/hair2",
+                      "px":  1.0105778,
+                      "py":  0,
+                      "qz":  0,
+                      "qw":  1,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/neck/head/hair1/hair2/hair3",
+                      "px":  0.835994,
+                      "py":  0,
+                      "qz":  0,
+                      "qw":  1,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shoulder_R",
+                      "px":  0.4022837,
+                      "py":  0.1564704,
+                      "qz":  0.7246017,
+                      "qw":  0.6891679,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shoulder_R/arm_upper_R",
+                      "px":  0.211054,
+                      "py":  0,
+                      "qz":  0.4855911,
+                      "qw":  0.8741861,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shoulder_R/arm_upper_R/arm_lower_R",
+                      "px":  0.8259525,
+                      "py":  1E-07,
+                      "qz":  0.0338011,
+                      "qw":  0.9994286,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shoulder_R/arm_upper_R/arm_lower_R/hand_R",
+                      "px":  0.6554362,
+                      "py":  -3E-07,
+                      "qz":  0.0986457,
+                      "qw":  0.9951227,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shoulder_R/arm_upper_R/arm_lower_R/hand_R/kousenju",
+                      "px":  0.4674525,
+                      "py":  0.2725095,
+                      "qz":  -0.3353297,
+                      "qw":  0.9421008,
+                      "scale":  -0.1942372
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shoulder_R/arm_upper_R/arm_lower_R/hand_R/kousenju/zyukou_offset",
+                      "px":  -4.5,
+                      "py":  2.82,
+                      "qz":  0.1750336,
+                      "qw":  -0.9845625,
+                      "scale":  -2.9328716
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shoulder_R/arm_upper_R/arm_lower_R/hand_R/kousenju/zyukou_offset (1)",
+                      "px":  -4.5000052,
+                      "py":  2.820004,
+                      "qz":  -0.4238912,
+                      "qw":  0.9057131,
+                      "scale":  -2.932902
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shoulder_R/arm_upper_R/arm_lower_R/hand_R/kousenju/zyukou_offset (2)",
+                      "px":  -4.500009,
+                      "py":  2.8200073,
+                      "qz":  0.085756,
+                      "qw":  0.9963162,
+                      "scale":  -2.9329035
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shouder_L",
+                      "px":  0.3397372,
+                      "py":  -0.2106074,
+                      "qz":  0.914229,
+                      "qw":  -0.4051979,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shouder_L/arm_upper_L",
+                      "px":  0.2009612,
+                      "py":  0,
+                      "qz":  -0.4017962,
+                      "qw":  0.9157291,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shouder_L/arm_upper_L/arm_lower_L",
+                      "px":  0.8259525,
+                      "py":  1E-07,
+                      "qz":  0.0143522,
+                      "qw":  0.999897,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shouder_L/arm_upper_L/arm_lower_L/pipe_isu (1)",
+                      "px":  0.4737652,
+                      "py":  2.1345456,
+                      "qz":  -0.2472799,
+                      "qw":  -0.9689441,
+                      "scale":  0.6099281
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shouder_L/arm_upper_L/arm_lower_L/pipe_isu (1)/Hit Box 1",
+                      "px":  0.331,
+                      "py":  -1.044,
+                      "qz":  0,
+                      "qw":  1,
+                      "scale":  3.8916025
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shouder_L/arm_upper_L/arm_lower_L/pipe_isu (1)/Hit Box 2",
+                      "px":  0.331,
+                      "py":  2.65,
+                      "qz":  0,
+                      "qw":  1,
+                      "scale":  3.891605
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shouder_L/arm_upper_L/arm_lower_L/pipe_isu (1)/missile_offset",
+                      "px":  0.27,
+                      "py":  0.46,
+                      "qz":  0.3051136,
+                      "qw":  0.952316,
+                      "scale":  3.1776996
+                  },
+                  {
+                      "path":  "bone/hips/spine_low/spine_high/shouder_L/arm_upper_L/arm_lower_L/hand_L",
+                      "px":  0.5635981,
+                      "py":  1E-07,
+                      "qz":  -0.1159888,
+                      "qw":  0.9917344,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/leg_upper_R",
+                      "px":  -0.2468811,
+                      "py":  0.3107756,
+                      "qz":  0.9889979,
+                      "qw":  0.1479294,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/leg_upper_R/leg_lower_R",
+                      "px":  1.1103598,
+                      "py":  0,
+                      "qz":  -0.0419783,
+                      "qw":  0.9991186,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/leg_upper_R/leg_lower_R/foot_R",
+                      "px":  1.2014266,
+                      "py":  0,
+                      "qz":  0.1725855,
+                      "qw":  0.9849946,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/leg_upper_L",
+                      "px":  -0.3100067,
+                      "py":  -0.2035145,
+                      "qz":  0.9980666,
+                      "qw":  0.0621534,
+                      "scale":  1.0000002
+                  },
+                  {
+                      "path":  "bone/hips/leg_upper_L/leg_lower_L",
+                      "px":  1.0776477,
+                      "py":  1E-07,
+                      "qz":  0.0342877,
+                      "qw":  0.9994121,
+                      "scale":  1
+                  },
+                  {
+                      "path":  "bone/hips/leg_upper_L/leg_lower_L/foot_L",
+                      "px":  1.2014266,
+                      "py":  0,
+                      "qz":  0.4178716,
+                      "qw":  0.9085061,
+                      "scale":  1
+                  }
+              ]
+}
