@@ -38,12 +38,19 @@ namespace Koitan
         /// 無敵時間
         /// </summary>
         float invincibleTime = 0f;
+        /// <summary>
+        /// 生成時のスケール。向きの反転で符号だけ変え、大きさは保つために使う。
+        /// </summary>
+        Vector3 baseScale = Vector3.one;
         // Start is called before the first frame update
         void Awake()
         {
             TryGetComponent(out animator);
             TryGetComponent(out motor);
             TryGetComponent(out charaColorChanger);
+            //向きを変えるときにスケールを±1で上書きすると、
+            //1以外の大きさで作ったキャラが勝手に拡大される。元の大きさを覚えておく
+            baseScale = transform.localScale;
             /*
             mesh.SetActive(false);
             motor.enabled = false;
@@ -86,12 +93,12 @@ namespace Koitan
             if (KoitanInput.GetStick(playerIndex).x > 0.1f)
             {
                 animator.SetBool("Run", true);
-                transform.localScale = new Vector3(1, 1, 1);
+                SetFacing(1);
             }
             else if (KoitanInput.GetStick(playerIndex).x < -0.1f)
             {
                 animator.SetBool("Run", true);
-                transform.localScale = new Vector3(-1, 1, 1);
+                SetFacing(-1);
             }
             else
             {
@@ -159,6 +166,14 @@ namespace Koitan
         }
 
         /// <summary>
+        /// 向きを変える。大きさは生成時のものを保つ。
+        /// </summary>
+        void SetFacing(int sign)
+        {
+            transform.localScale = new Vector3(Mathf.Abs(baseScale.x) * sign, baseScale.y, baseScale.z);
+        }
+
+        /// <summary>
         /// 操作不能時間
         /// </summary>
         /// <param name="time"></param>
@@ -176,7 +191,8 @@ namespace Koitan
             if (time > invincibleTime)
             {
                 invincibleTime = time;
-                charaColorChanger.SetFlashTime(time);
+                //移植キャラはCharaColorChangerを持たないのでnullを許容する
+                if (charaColorChanger != null) charaColorChanger.SetFlashTime(time);
             }
         }
 
@@ -194,7 +210,8 @@ namespace Koitan
         {
             if (grabedBomb != null)
             {
-                grabedBomb.Throw(new Vector3(10 * transform.localScale.x, 2, 0));
+                //投げる強さは大きさに引きずられないよう符号だけ使う
+                grabedBomb.Throw(new Vector3(10 * Mathf.Sign(transform.localScale.x), 2, 0));
                 grabedBomb = null;
             }
         }
@@ -203,7 +220,7 @@ namespace Koitan
         {
             this.playerIndex = playerIndex;
             this.teamIndex = teamIndex;
-            charaColorChanger.ChangeColor(playerIndex, teamIndex);
+            if (charaColorChanger != null) charaColorChanger.ChangeColor(playerIndex, teamIndex);
         }
 
         //IBattlePlayerの実装。HitBoxが「誰の攻撃か」「誰に当たったか」を判別するのに使う

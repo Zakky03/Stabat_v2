@@ -43,6 +43,11 @@ namespace Koitan
         private float inoperableTime = 0f;
         private float invincibleTime = 0f;
 
+        /// <summary>
+        /// 生成時のスケール。向きの反転で符号だけ変え、大きさは保つために使う。
+        /// </summary>
+        private Vector3 baseScale = Vector3.one;
+
         private NetworkButtons previousButtons;
 
         private void Awake()
@@ -50,11 +55,15 @@ namespace Koitan
             TryGetComponent(out animator);
             TryGetComponent(out motor);
             TryGetComponent(out charaColorChanger);
+            baseScale = transform.localScale;
         }
 
         public override void Render()
         {
-            transform.localScale = FacingRight ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
+            // 大きさは生成時のものを保ち、符号だけ変える。±1 で上書きすると
+            // 1 以外の大きさで作ったキャラ（移植キャラは 0.46）が勝手に拡大される。
+            float sign = FacingRight ? 1f : -1f;
+            transform.localScale = new Vector3(Mathf.Abs(baseScale.x) * sign, baseScale.y, baseScale.z);
         }
 
         public override void Spawned()

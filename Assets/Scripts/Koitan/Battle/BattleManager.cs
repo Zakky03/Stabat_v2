@@ -31,6 +31,20 @@ namespace Koitan
         public static ColorSets ColorSets => instance.colorSets;
         [SerializeField]
         PlayerController charaPrefab;
+        /// <summary>
+        /// オフラインの動作確認用に、起動時にcharaPrefabを人数ぶん出すか。
+        /// 本来の生成処理(Awake内のコメントアウト部分)はキャラ選択画面を経由して
+        /// BattleSettingが埋まっている前提なので、単体のシーンでは何も出てこない。
+        /// これはその代わりに手早く動かすためのもの。
+        /// </summary>
+        [SerializeField]
+        bool spawnForDebug = false;
+        /// <summary>
+        /// spawnForDebugがtrueのとき出す人数。0以下ならKoitanInputに繋がっている
+        /// コントローラの数ぶん出す(繋がっていなければ1体)。
+        /// </summary>
+        [SerializeField]
+        int debugPlayerNum = 0;
         [SerializeField]
         ControllerInput ai;
         [SerializeField]
@@ -111,6 +125,46 @@ namespace Koitan
             }
         }
 
+        /// <summary>
+        /// 動作確認用の生成。BattleSettingを使わず、charaPrefabをそのまま並べる。
+        /// </summary>
+        void SpawnForDebug()
+        {
+            if (charaPrefab == null)
+            {
+                Debug.LogWarning("[BattleManager] charaPrefabが未設定なので生成しません。");
+                return;
+            }
+
+            int num = debugPlayerNum > 0 ? debugPlayerNum : Mathf.Max(1, KoitanInput.GetControllerNum());
+            num = Mathf.Min(num, BattleGlobal.MaxPlayerNum);
+
+            for (int i = 0; i < num; i++)
+            {
+                //initPositionsが足りなければ最後の位置から横にずらして置く
+                Vector3 pos;
+                if (initPositions != null && i < initPositions.Length && initPositions[i] != null)
+                {
+                    pos = initPositions[i].position;
+                }
+                else
+                {
+                    pos = new Vector3(i * 2f, 0f, 0f);
+                }
+
+                PlayerController player = Instantiate(charaPrefab, pos, Quaternion.identity);
+                //playerIndexはKoitanInputのコントローラ番号と対応させる
+                player.ChangeColor(i, i);
+                players.Add(player);
+
+                if (targetGroup != null) targetGroup.AddMember(player.transform, 1f, 3f);
+
+                moneys[i] = 0;
+            }
+
+            Debug.Log($"[BattleManager] 動作確認用に{num}体生成しました（コントローラ数={KoitanInput.GetControllerNum()}）。");
+        }
+
         public Transform GetInitPosition(int index)
         {
             return initPositions[index];
@@ -123,6 +177,9 @@ namespace Koitan
 
         private void Start()
         {
+            //動作確認用の生成。お金UIの人数計算より前に済ませる必要がある
+            if (spawnForDebug) SpawnForDebug();
+
             if (!isOnlineBattle)
             {
                 for (int i = 0; i < BattleGlobal.MaxPlayerNum; i++)

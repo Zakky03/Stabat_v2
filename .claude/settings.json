@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__mcp-unity__get_console_logs",
+      "mcp__mcp-unity__get_gameobject",
+      "mcp__mcp-unity__get_play_mode_status",
+      "mcp__mcp-unity__get_scene_info",
+      "mcp__mcp-unity__get_scenes_hierarchy",
+      "mcp__mcp-unity__get_material_info",
+      "Bash(tasklist *)"
+    ]
+  }
+}

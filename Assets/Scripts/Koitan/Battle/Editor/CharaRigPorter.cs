@@ -144,6 +144,13 @@ namespace Koitan.EditorTools
         /// <summary>移植元から持ってきた Animator Controller。4 体で共有している。</summary>
         const string ControllerPath = "Assets/Animations/Boy1/basis.controller";
 
+        /// <summary>
+        /// キャラのルートスケール。移植元プレハブは 0.55 だったが、それだと
+        /// 既存キャラより 2 割ほど大きくなる（本体コライダー 6.693 x 0.55 = 3.68 に対し
+        /// kawaztan は 3.08）。背丈が揃うよう 3.08 / 6.693 ≒ 0.46 にしている。
+        /// </summary>
+        public const float RootScale = 0.46f;
+
         static RigData LoadRig(string chara)
         {
             string path = Dir(chara) + "/rig.json";
@@ -175,7 +182,10 @@ namespace Koitan.EditorTools
             GameObject root = GameObject.Find(RigRoot(chara)) ?? new GameObject(RigRoot(chara));
             Undo.RegisterFullObjectHierarchyUndo(root, "Build rig");
 
-            root.transform.localScale = new Vector3(data.rootScale, data.rootScale, 1f);
+            // 移植元のルートは 0.55 倍だったが、それだとこのプロジェクトの既存キャラより
+            // 2 割ほど大きくなる（移植元コライダー 6.693 x 0.55 = 3.68 に対し、
+            // kawaztan は 3.08）。高さが揃うよう 0.46 にしている。
+            root.transform.localScale = new Vector3(RootScale, RootScale, 1f);
 
             // bone 自体（クリップのパスが "bone/..." で始まるので必須）
             EnsurePath(root.transform, "bone");
